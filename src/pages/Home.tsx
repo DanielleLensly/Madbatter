@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '../components/common/Navbar';
+import Footer from '../components/common/Footer';
 import Hero from '../components/home/Hero';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
@@ -482,6 +483,7 @@ const Home: React.FC = () => {
         📅
       </button>
 
+      <Footer />
     </div>
   );
 };

@@ -25,9 +25,16 @@ export const sendBookingEmail = async (data: {
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+  // Debug logging for production troubleshooting
+  console.log('📧 Attempting to send booking email...', {
+    serviceIdPresent: !!serviceId,
+    templateIdPresent: !!templateId,
+    publicKeyPresent: !!publicKey
+  });
+
   if (!serviceId || !templateId || !publicKey) {
-    console.error('EmailJS configuration missing.');
-    throw new Error('Email service not configured.');
+    console.error('❌ EmailJS configuration missing. Please check your .env or GitHub Secrets.');
+    throw new Error('Email service not configured. Check console for details.');
   }
 
   try {
@@ -62,9 +69,16 @@ export const sendContactEmail = async (data: {
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID; // Can use same template or different one
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+  // Debug logging for production troubleshooting
+  console.log('📧 Attempting to send contact email...', {
+    serviceIdPresent: !!serviceId,
+    templateIdPresent: !!templateId,
+    publicKeyPresent: !!publicKey
+  });
+
   if (!serviceId || !templateId || !publicKey) {
-    console.error('EmailJS configuration missing.');
-    throw new Error('Email service not configured.');
+    console.error('❌ EmailJS configuration missing. Please check your .env or GitHub Secrets.');
+    throw new Error('Email service not configured. Check console for details.');
   }
 
   try {

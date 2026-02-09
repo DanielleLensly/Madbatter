@@ -7,9 +7,12 @@ import { AuthProvider } from './context/AuthContext';
 import './App.scss';
 
 function App() {
+  // Use /Madbatter/ basename in production (GitHub Pages), root in development
+  const basename = import.meta.env.PROD ? '/Madbatter' : '/';
+
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

@@ -561,3 +561,30 @@
     box-shadow: 0 8px 24px rgba($color-primary, 0.7), 0 0 0 10px rgba($color-primary, 0.1);
   }
 }
+
+// Form Validation Styles
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.errorInput {
+  border-color: $color-danger !important;
+  background-color: rgba($color-danger, 0.05);
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($color-danger, 0.1);
+  }
+}
+
+.errorMessage {
+  color: $color-danger;
+  font-size: 0.75rem;
+  margin-left: $spacing-xs;
+  font-weight: 500;
+  
+  @include tablet {
+    font-size: 0.8rem;
+  }
+}

@@ -9,7 +9,7 @@ import { useImageLoader } from '../hooks/useImageLoader';
 import { sendBookingEmail, sendContactEmail } from '../utils/emailService';
 import { Special, GalleryImage, CategoryType } from '../types';
 import { formatDate, isDateInRange, isDateBefore, isDateAfter } from '../utils/dateUtils';
-import { formatPhoneNumber, unformatPhoneNumber } from '../utils/phoneUtils';
+import { formatPhoneNumber, unformatPhoneNumber, isValidPhoneNumber } from '../utils/phoneUtils';
 import { STORAGE_KEYS, CATEGORIES } from '../utils/constants';
 import styles from './Home.module.scss';
 
@@ -46,6 +46,8 @@ const Home: React.FC = () => {
   const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   // Filter specials by date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -59,8 +61,40 @@ const Home: React.FC = () => {
     ? galleryImages.filter(img => img.category === selectedCategory)
     : [];
 
+  const validateBooking = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!bookingForm.name.trim()) {
+      newErrors.bookingName = 'Name is required';
+    } else if (!/^[a-zA-Z\s]+$/.test(bookingForm.name)) {
+      newErrors.bookingName = 'Name must contain only letters';
+    }
+    if (!bookingForm.phone.trim()) {
+      newErrors.bookingPhone = 'Phone number is required';
+    } else if (!isValidPhoneNumber(bookingForm.phone)) {
+      newErrors.bookingPhone = 'Phone number must be 10 digits';
+    }
+    if (!bookingForm.date) newErrors.bookingDate = 'Date is required';
+    if (!bookingForm.description.trim()) newErrors.bookingDescription = 'Description is required';
+
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Clear previous booking errors
+    setErrors(prev => {
+      const next = { ...prev };
+      Object.keys(next).forEach(key => {
+        if (key.startsWith('booking')) delete next[key];
+      });
+      return next;
+    });
+
+    if (!validateBooking()) return;
+
     setIsBookingSubmitting(true);
 
     try {
@@ -91,8 +125,38 @@ const Home: React.FC = () => {
     }
   };
 
+  const validateContact = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!contactForm.name.trim()) {
+      newErrors.contactName = 'Name is required';
+    } else if (!/^[a-zA-Z\s]+$/.test(contactForm.name)) {
+      newErrors.contactName = 'Name must contain only letters';
+    }
+    if (!contactForm.email.trim()) newErrors.contactEmail = 'Email is required';
+    if (contactForm.phone.trim() && !isValidPhoneNumber(contactForm.phone)) {
+      newErrors.contactPhone = 'Phone number must be 10 digits';
+    }
+    if (!contactForm.message.trim()) newErrors.contactMessage = 'Message is required';
+
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Clear previous contact errors
+    setErrors(prev => {
+      const next = { ...prev };
+      Object.keys(next).forEach(key => {
+        if (key.startsWith('contact')) delete next[key];
+      });
+      return next;
+    });
+
+    if (!validateContact()) return;
+
     setIsContactSubmitting(true);
 
     try {
@@ -267,33 +331,46 @@ const Home: React.FC = () => {
             </div>
 
             <form className={styles.contactForm} onSubmit={handleContactSubmit}>
-              <input
-                type="text"
-                placeholder="Your Name"
-                value={contactForm.name}
-                onChange={e => setContactForm({ ...contactForm, name: e.target.value })}
-                required
-              />
-              <input
-                type="email"
-                placeholder="Your Email"
-                value={contactForm.email}
-                onChange={e => setContactForm({ ...contactForm, email: e.target.value })}
-                required
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number (e.g., 082 123 4567)"
-                value={contactForm.phone}
-                onChange={e => setContactForm({ ...contactForm, phone: formatPhoneNumber(e.target.value) })}
-              />
-              <textarea
-                placeholder="Your Message"
-                rows={5}
-                value={contactForm.message}
-                onChange={e => setContactForm({ ...contactForm, message: e.target.value })}
-                required
-              />
+              <div className={styles.formGroup}>
+                <input
+                  type="text"
+                  placeholder="Your Name *"
+                  value={contactForm.name}
+                  onChange={e => setContactForm({ ...contactForm, name: e.target.value })}
+                  className={errors.contactName ? styles.errorInput : ''}
+                />
+                {errors.contactName && <span className={styles.errorMessage}>{errors.contactName}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                <input
+                  type="email"
+                  placeholder="Your Email *"
+                  value={contactForm.email}
+                  onChange={e => setContactForm({ ...contactForm, email: e.target.value })}
+                  className={errors.contactEmail ? styles.errorInput : ''}
+                />
+                {errors.contactEmail && <span className={styles.errorMessage}>{errors.contactEmail}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                <input
+                  type="tel"
+                  placeholder="Phone Number (e.g., 082 123 4567)"
+                  value={contactForm.phone}
+                  onChange={e => setContactForm({ ...contactForm, phone: formatPhoneNumber(e.target.value) })}
+                  className={errors.contactPhone ? styles.errorInput : ''}
+                />
+                {errors.contactPhone && <span className={styles.errorMessage}>{errors.contactPhone}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                <textarea
+                  placeholder="Your Message *"
+                  rows={5}
+                  value={contactForm.message}
+                  onChange={e => setContactForm({ ...contactForm, message: e.target.value })}
+                  className={errors.contactMessage ? styles.errorInput : ''}
+                />
+                {errors.contactMessage && <span className={styles.errorMessage}>{errors.contactMessage}</span>}
+              </div>
               <Button type="submit" fullWidth disabled={isContactSubmitting}>
                 {isContactSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
@@ -305,40 +382,54 @@ const Home: React.FC = () => {
       {/* Booking Modal */}
       <Modal isOpen={bookingModal.isOpen} onClose={bookingModal.close} title="Book a Consultation" maxWidth="800px">
         <form onSubmit={handleBookingSubmit} className={styles.bookingForm}>
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={bookingForm.name}
-            onChange={e => setBookingForm({ ...bookingForm, name: e.target.value })}
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Phone Number (e.g., 082 123 4567)"
-            value={bookingForm.phone}
-            onChange={e => setBookingForm({ ...bookingForm, phone: formatPhoneNumber(e.target.value) })}
-            required
-          />
+          <div className={styles.formGroup}>
+            <input
+              type="text"
+              placeholder="Your Name *"
+              value={bookingForm.name}
+              onChange={e => setBookingForm({ ...bookingForm, name: e.target.value })}
+              className={errors.bookingName ? styles.errorInput : ''}
+            />
+            {errors.bookingName && <span className={styles.errorMessage}>{errors.bookingName}</span>}
+          </div>
+          <div className={styles.formGroup}>
+            <input
+              type="tel"
+              placeholder="Phone Number (e.g., 082 123 4567) *"
+              value={bookingForm.phone}
+              onChange={e => setBookingForm({ ...bookingForm, phone: formatPhoneNumber(e.target.value) })}
+              className={errors.bookingPhone ? styles.errorInput : ''}
+            />
+            {errors.bookingPhone && <span className={styles.errorMessage}>{errors.bookingPhone}</span>}
+          </div>
           <input
             type="email"
             placeholder="Email (optional)"
             value={bookingForm.email}
             onChange={e => setBookingForm({ ...bookingForm, email: e.target.value })}
           />
-          <input
-            type="date"
-            value={bookingForm.date}
-            onChange={e => setBookingForm({ ...bookingForm, date: e.target.value })}
-            min={new Date().toISOString().split('T')[0]}
-            required
-          />
-          <textarea
-            placeholder="Tell us about your event..."
-            rows={4}
-            value={bookingForm.description}
-            onChange={e => setBookingForm({ ...bookingForm, description: e.target.value })}
-            required
-          />
+          <div className={styles.formGroup}>
+            <label htmlFor="booking-date">Event Date *</label>
+            <input
+              id="booking-date"
+              type="date"
+              value={bookingForm.date}
+              onChange={e => setBookingForm({ ...bookingForm, date: e.target.value })}
+              min={new Date().toISOString().split('T')[0]}
+              className={errors.bookingDate ? styles.errorInput : ''}
+            />
+            {errors.bookingDate && <span className={styles.errorMessage}>{errors.bookingDate}</span>}
+          </div>
+          <div className={styles.formGroup}>
+            <textarea
+              placeholder="Tell us about your event... *"
+              rows={4}
+              value={bookingForm.description}
+              onChange={e => setBookingForm({ ...bookingForm, description: e.target.value })}
+              className={errors.bookingDescription ? styles.errorInput : ''}
+            />
+            {errors.bookingDescription && <span className={styles.errorMessage}>{errors.bookingDescription}</span>}
+          </div>
           <Button type="submit" fullWidth disabled={isBookingSubmitting}>
             {isBookingSubmitting ? 'Sending...' : 'Submit Request'}
           </Button>

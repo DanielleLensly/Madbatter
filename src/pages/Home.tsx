@@ -316,20 +316,20 @@ const Home: React.FC = () => {
           <h2 className={styles.sectionTitle}>Get in Touch</h2>
           <div className={styles.contactGrid}>
             <div className={styles.contactInfo}>
-              <div className={styles.contactItem}>
+              <a href="tel:+27843002719" className={styles.contactItem}>
                 <span className={styles.contactIcon}>📞</span>
                 <div>
                   <h4>Phone</h4>
-                  <p>+27 123 456 789</p>
+                  <p>084 300 2719</p>
                 </div>
-              </div>
-              <div className={styles.contactItem}>
+              </a>
+              <a href="mailto:anchen101@gmail.com" className={styles.contactItem}>
                 <span className={styles.contactIcon}>📧</span>
                 <div>
                   <h4>Email</h4>
-                  <p>hello@themadbatter.com</p>
+                  <p>anchen101@gmail.com</p>
                 </div>
-              </div>
+              </a>
             </div>
 
             <form className={styles.contactForm} onSubmit={handleContactSubmit}>

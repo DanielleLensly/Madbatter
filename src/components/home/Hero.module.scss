@@ -1,15 +1,18 @@
 @use '../../styles/variables' as *;
 
 .hero {
-  min-height: 100vh;
+  min-height: 70vh;
   @include flex-center;
   position: relative;
   background: linear-gradient(135deg, $color-light 0%, $color-white 100%);
-  padding: $spacing-lg $spacing-md;
+  padding: $spacing-md $spacing-md;
+  padding-top: 100px;
   overflow: hidden;
 
   @include tablet {
+    min-height: 100vh;
     padding: $spacing-xl $spacing-md;
+    padding-top: $spacing-xl;
   }
 
   // Glow animation layer

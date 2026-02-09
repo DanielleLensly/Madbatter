@@ -285,6 +285,9 @@
   background: $color-primary-light;
   border-radius: $radius-md;
   transition: $transition-base;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
   
   @include tablet {
     padding: $spacing-md;
@@ -292,6 +295,11 @@
 
   &:hover {
     transform: translateX(4px);
+    background: $color-primary;
+    
+    h4, p {
+      color: $color-white;
+    }
   }
 
   h4 {

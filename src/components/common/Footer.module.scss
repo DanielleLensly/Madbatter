@@ -1,0 +1,37 @@
+@import '../../styles/variables';
+
+.footer {
+  background-color: $color-primary;
+  color: $color-white;
+  padding: $spacing-md 0;
+  margin-top: auto;
+
+  .footerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+
+    @include mobile {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  .copyright {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  .adminLink {
+    color: rgba($color-white, 0.6);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $color-white;
+    }
+  }
+}

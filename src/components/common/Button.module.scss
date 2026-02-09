@@ -1,4 +1,5 @@
-@import '../../styles/variables';
+@use 'sass:color';
+@use '../../styles/variables' as *;
 
 .button {
   padding: $spacing-xs $spacing-sm;
@@ -43,7 +44,7 @@
   color: $color-dark;
 
   &:hover:not(:disabled) {
-    background: darken($color-secondary, 5%);
+    background: color.adjust($color-secondary, $lightness: -5%);
   }
 }
 
@@ -63,7 +64,7 @@
   color: $color-white;
 
   &:hover:not(:disabled) {
-    background: darken($color-danger, 10%);
+    background: color.adjust($color-danger, $lightness: -10%);
   }
 }
 

@@ -1,4 +1,4 @@
-@import '../../styles/variables';
+@use '../../styles/variables' as *;
 
 .footer {
   background-color: $color-primary;
@@ -8,14 +8,16 @@
 
   .footerContent {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    text-align: center;
     align-items: center;
     flex-wrap: wrap;
     gap: $spacing-sm;
 
-    @include mobile {
-      flex-direction: column;
-      text-align: center;
+    @media (min-width: $breakpoint-mobile) {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
     }
   }
 

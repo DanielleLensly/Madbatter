@@ -9,6 +9,7 @@ import { useModal } from '../hooks/useModal';
 import { Special, GalleryImage, User } from '../types';
 import { STORAGE_KEYS, CATEGORIES } from '../utils/constants';
 import { formatDate } from '../utils/dateUtils';
+import { defaultGalleryImages } from '../data/defaultGalleryData';
 import styles from './Admin.module.scss';
 
 const Admin: React.FC = () => {
@@ -18,7 +19,7 @@ const Admin: React.FC = () => {
 
   // Storage
   const [specials, setSpecials] = useLocalStorage<Special[]>(STORAGE_KEYS.SPECIALS, []);
-  const [galleryImages, setGalleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, []);
+  const [galleryImages, setGalleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, defaultGalleryImages);
   const [users, setUsers] = useLocalStorage<User[]>(STORAGE_KEYS.USERS, []);
 
   // Modals
@@ -339,7 +340,7 @@ const Admin: React.FC = () => {
             <h1>Admin Dashboard</h1>
             <div className={styles.headerActions}>
               <span className={styles.username}>👤 {username}</span>
-              <a href="/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <a href="https://daniellelensly.github.io/Madbatter/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                 <Button variant="outline">
                   View Site
                 </Button>

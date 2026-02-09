@@ -228,13 +228,7 @@ const Login: React.FC = () => {
             </>
           )}
 
-          <div className={styles.defaultCreds}>
-            <small>
-              <strong>Default credentials:</strong><br />
-              Username: admin<br />
-              Password: admin123
-            </small>
-          </div>
+
         </div>
       </div>
     </div>

@@ -481,6 +481,7 @@ const Home: React.FC = () => {
       <button className={styles.floatingBtn} onClick={bookingModal.open} aria-label="Book Now">
         📅
       </button>
+
     </div>
   );
 };

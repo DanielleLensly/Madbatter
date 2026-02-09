@@ -15,7 +15,7 @@ function App() {
       <BrowserRouter basename={basename}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/madbatter-login" element={<Login />} />
           <Route
             path="/admin"
             element={

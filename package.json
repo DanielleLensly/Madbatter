@@ -11,7 +11,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "postbuild": "node -e \"const fs=require('fs'); fs.copyFileSync('dist/index.html', 'dist/404.html');\""
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

@@ -12,6 +12,7 @@ import { Special, GalleryImage, CategoryType } from '../types';
 import { formatDate, isDateInRange, isDateBefore, isDateAfter } from '../utils/dateUtils';
 import { formatPhoneNumber, unformatPhoneNumber, isValidPhoneNumber } from '../utils/phoneUtils';
 import { STORAGE_KEYS, CATEGORIES } from '../utils/constants';
+import { defaultGalleryImages } from '../data/defaultGalleryData';
 import styles from './Home.module.scss';
 
 const Home: React.FC = () => {
@@ -19,7 +20,7 @@ const Home: React.FC = () => {
   useImageLoader();
 
   const [specials] = useLocalStorage<Special[]>(STORAGE_KEYS.SPECIALS, []);
-  const [galleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, []);
+  const [galleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, defaultGalleryImages);
 
   const [activeSpecialsTab, setActiveSpecialsTab] = useState<'current' | 'upcoming' | 'past'>('current');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);

@@ -1,0 +1,78 @@
+// ==================== SCSS Variables & Design System ====================
+
+// Color Palette - Cool Rose & Slate
+$color-primary: #e8647c;
+$color-primary-dark: #c23854;
+$color-primary-light: #ffd4dc;
+$color-secondary: #f0a0b0;
+$color-accent: #ff8fa3;
+$color-dark: #1a1a2e;
+$color-gray-dark: #3d3d5c;
+$color-gray: #6b6b8a;
+$color-gray-light: #d8d8e8;
+$color-light: #f5f5fa;
+$color-white: #ffffff;
+$color-success: #27ae60;
+$color-danger: #e74c3c;
+
+// Typography
+$font-heading: 'Playfair Display', serif;
+$font-body: 'Inter', sans-serif;
+
+// Spacing
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Border Radius
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+
+// Shadows
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+// Transitions
+$transition-base: all 0.3s ease;
+
+// Breakpoints
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+$breakpoint-desktop: 1200px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Mobile-first breakpoints
+@mixin tablet {
+  @media (min-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: $breakpoint-desktop) {
+    @content;
+  }
+}

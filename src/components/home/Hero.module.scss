@@ -1,0 +1,78 @@
+@import '../../styles/variables';
+
+.hero {
+  min-height: 100vh;
+  @include flex-center;
+  position: relative;
+  background: linear-gradient(135deg, $color-light 0%, $color-white 100%);
+  padding: $spacing-lg $spacing-md;
+  overflow: hidden;
+
+  @include tablet {
+    padding: $spacing-xl $spacing-md;
+  }
+
+  // Glow animation layer
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(232, 100, 124, 0.3), transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(232, 100, 124, 0.3), transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite;
+    z-index: 0;
+  }
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+
+.heroTitle {
+  font-family: $font-heading;
+  font-size: clamp(2rem, 8vw, 5rem);
+  font-weight: 700;
+  color: $color-primary;
+  margin-bottom: $spacing-sm;
+  line-height: 1.2;
+  
+  @include tablet {
+    margin-bottom: $spacing-md;
+  }
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  color: $color-gray-dark;
+  margin-bottom: $spacing-lg;
+  font-weight: 300;
+  
+  @include tablet {
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.heroCta {
+  @include flex-center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  
+  @include tablet {
+    gap: $spacing-md;
+  }
+}
+
+@keyframes heroGlow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

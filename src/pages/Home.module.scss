@@ -1,0 +1,563 @@
+@import '../styles/variables';
+
+.home {
+  padding-top: 70px; // Account for fixed navbar
+}
+
+.section {
+  padding: $spacing-lg 0;
+  
+  @include tablet {
+    padding: $spacing-xl 0;
+  }
+  
+  &:nth-child(even) {
+    background: $color-light;
+  }
+}
+
+.sectionTitle {
+  font-family: $font-heading;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: $color-primary;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+  
+  @include tablet {
+    margin-bottom: $spacing-xl;
+  }
+}
+
+// Tabs
+.tabs {
+  @include flex-center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+  
+  @include tablet {
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.tab {
+  padding: $spacing-xs $spacing-sm;
+  background: transparent;
+  border: 2px solid $color-gray-light;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: $color-gray;
+  cursor: pointer;
+  transition: $transition-base;
+
+  @include tablet {
+    padding: $spacing-sm $spacing-md;
+    font-size: 1rem;
+  }
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary, $color-accent);
+    border-color: $color-primary;
+    color: $color-white;
+  }
+}
+
+// Specials - Mobile first
+.specialsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-lg;
+  }
+  
+  @include desktop {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.specialCard {
+  background: $color-white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+  transition: $transition-base;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+
+  &.past {
+    opacity: 0.85;
+    
+    .specialImage {
+      filter: grayscale(30%);
+    }
+  }
+}
+
+.specialBadge {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: linear-gradient(135deg, $color-primary, $color-accent);
+  color: $color-white;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
+  
+  @include tablet {
+    font-size: 0.875rem;
+  }
+
+  &.upcoming {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+  }
+
+  &.expired {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  }
+}
+
+.specialImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  
+  @include tablet {
+    height: 250px;
+  }
+}
+
+.specialContent {
+  padding: $spacing-sm;
+  
+  @include tablet {
+    padding: $spacing-md;
+  }
+
+  h3 {
+    font-family: $font-heading;
+    color: $color-dark;
+    margin-bottom: $spacing-xs;
+    font-size: 1.125rem;
+    
+    @include tablet {
+      font-size: 1.25rem;
+    }
+  }
+
+  p {
+    color: $color-gray;
+    margin-bottom: $spacing-sm;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+}
+
+.specialDates {
+  color: $color-gray-dark;
+  font-size: 0.8rem;
+  margin-bottom: $spacing-sm;
+  
+  @include tablet {
+    font-size: 0.875rem;
+  }
+}
+
+.expiredNotice {
+  padding: $spacing-xs;
+  background: $color-light;
+  border-radius: $radius-sm;
+  text-align: center;
+  color: $color-gray;
+  font-size: 0.8rem;
+  font-weight: 600;
+  
+  @include tablet {
+    padding: $spacing-sm;
+    font-size: 0.875rem;
+  }
+}
+
+// Services - Mobile first
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+  
+  @include tablet {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+  }
+  
+  @include desktop {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.serviceCard {
+  background: $color-white;
+  padding: $spacing-md;
+  border-radius: $radius-lg;
+  text-align: center;
+  cursor: pointer;
+  transition: $transition-base;
+  box-shadow: $shadow-sm;
+  
+  @include tablet {
+    padding: $spacing-lg;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
+    background: linear-gradient(135deg, $color-primary-light, $color-white);
+  }
+
+  h3 {
+    font-family: $font-heading;
+    color: $color-dark;
+    margin-top: $spacing-xs;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      margin-top: $spacing-sm;
+      font-size: 1rem;
+    }
+  }
+}
+
+.serviceIcon {
+  font-size: 2rem;
+  display: block;
+  
+  @include tablet {
+    font-size: 3rem;
+  }
+}
+
+// Contact - Mobile first
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+  max-width: 900px;
+  margin: 0 auto;
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-xl;
+  }
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  
+  @include tablet {
+    gap: $spacing-md;
+  }
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: $color-primary-light;
+  border-radius: $radius-md;
+  transition: $transition-base;
+  
+  @include tablet {
+    padding: $spacing-md;
+  }
+
+  &:hover {
+    transform: translateX(4px);
+  }
+
+  h4 {
+    margin: 0 0 $spacing-xs 0;
+    color: $color-dark;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+
+  p {
+    margin: 0;
+    color: $color-gray-dark;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+}
+
+.contactIcon {
+  font-size: 1.5rem;
+  
+  @include tablet {
+    font-size: 2rem;
+  }
+}
+
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  input,
+  textarea {
+    padding: $spacing-sm;
+    border: 2px solid $color-gray-light;
+    border-radius: $radius-md;
+    font-family: $font-body;
+    font-size: 0.875rem;
+    transition: $transition-base;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+// Booking Form
+.bookingForm {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  input,
+  textarea,
+  select {
+    padding: $spacing-sm;
+    border: 2px solid $color-gray-light;
+    border-radius: $radius-md;
+    font-family: $font-body;
+    font-size: 0.875rem;
+    transition: $transition-base;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+    }
+  }
+}
+
+.phoneInput {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: $spacing-xs;
+  
+  @include tablet {
+    grid-template-columns: 120px 1fr;
+  }
+}
+
+// Gallery - Mobile first
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-xs;
+  
+  @include tablet {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-sm;
+  }
+  
+  @include desktop {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.galleryImage {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: $transition-base;
+  
+  @include tablet {
+    height: 200px;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Lightbox
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  @include flex-center;
+  z-index: 3000;
+  cursor: pointer;
+  padding: $spacing-md;
+
+  img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: $radius-md;
+  }
+}
+
+// Empty State
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: $spacing-lg;
+  color: $color-gray;
+  
+  @include tablet {
+    padding: $spacing-xl;
+  }
+
+  h3 {
+    color: $color-dark;
+    margin: $spacing-sm 0;
+    font-size: 1.125rem;
+    
+    @include tablet {
+      font-size: 1.25rem;
+    }
+  }
+  
+  p {
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  display: block;
+  
+  @include tablet {
+    font-size: 4rem;
+  }
+}
+
+// Thank You
+.thankYou {
+  text-align: center;
+  padding: $spacing-md;
+  
+  @include tablet {
+    padding: $spacing-lg;
+  }
+
+  h3 {
+    color: $color-success;
+    margin: $spacing-sm 0;
+    font-size: 1.125rem;
+    
+    @include tablet {
+      font-size: 1.25rem;
+    }
+  }
+
+  p {
+    color: $color-gray;
+    margin-bottom: $spacing-md;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+}
+
+.thankYouIcon {
+  font-size: 3rem;
+  display: block;
+  
+  @include tablet {
+    font-size: 4rem;
+  }
+}
+
+// Floating Button
+.floatingBtn {
+  position: fixed;
+  bottom: $spacing-md;
+  right: $spacing-md;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-primary, $color-accent);
+  color: $color-white;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba($color-primary, 0.4);
+  transition: $transition-base;
+  z-index: 1000;
+  animation: pulse 2s infinite;
+  
+  @include tablet {
+    bottom: $spacing-lg;
+    right: $spacing-lg;
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 40px rgba($color-primary, 0.6);
+    animation: none;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba($color-primary, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba($color-primary, 0.7), 0 0 0 10px rgba($color-primary, 0.1);
+  }
+}

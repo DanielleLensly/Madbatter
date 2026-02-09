@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - The Mad Batter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-primary-light), var(--color-light));
+            padding: var(--spacing-md);
+        }
+
+        .login-container {
+            background: var(--color-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 450px;
+            width: 100%;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .login-logo {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .login-subtitle {
+            color: var(--color-gray);
+            font-size: 1rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--color-dark);
+            font-size: 0.9375rem;
+        }
+
+        .form-group input {
+            padding: 1rem;
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: var(--transition-base);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+        }
+
+        .login-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            margin-top: var(--spacing-sm);
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            display: none;
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--color-gray);
+            transition: var(--transition-base);
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--color-primary);
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-sm);
+            font-size: 0.875rem;
+        }
+
+        .links a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-base);
+        }
+
+        .links a:hover {
+            color: var(--color-accent);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: var(--spacing-md);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="login-logo">🧁 The Mad Batter</h1>
+            <p class="login-subtitle" id="pageSubtitle">Admin Panel Login</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="login-form" id="loginForm">
+            <div id="loginMessage" class="message"></div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-toggle">
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                    <button type="button" class="password-toggle-btn" id="togglePassword">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                Login
+            </button>
+
+            <div class="links">
+                <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+            </div>
+        </form>
+
+        <!-- Password Recovery Form -->
+        <form class="login-form hidden" id="recoveryForm">
+            <div id="recoveryMessage" class="message"></div>
+
+            <div class="form-group">
+                <label for="recoveryUsername">Username</label>
+                <input type="text" id="recoveryUsername" name="recoveryUsername" required>
+            </div>
+
+            <div class="form-group" id="securityQuestionGroup" style="display: none;">
+                <label id="securityQuestionLabel">Security Question</label>
+                <input type="text" id="securityAnswer" name="securityAnswer" placeholder="Your answer">
+            </div>
+
+            <div class="form-group hidden" id="newPasswordGroup">
+                <label for="newPassword">New Password</label>
+                <div class="password-toggle">
+                    <input type="password" id="newPassword" name="newPassword">
+                    <button type="button" class="password-toggle-btn" id="toggleNewPassword">👁️</button>
+                </div>
+            </div>
+
+            <div class="form-group hidden" id="confirmPasswordGroup">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword">
+            </div>
+
+            <button type="submit" class="login-btn" id="recoveryBtn">
+                Continue
+            </button>
+
+            <div class="links">
+                <a href="#" id="backToLoginLink">← Back to Login</a>
+            </div>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← Back to Website</a>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        const userManager = new UserManager();
+        const attemptTracker = new LoginAttemptTracker();
+
+        const loginForm = document.getElementById('loginForm');
+        const recoveryForm = document.getElementById('recoveryForm');
+        const loginMessage = document.getElementById('loginMessage');
+        const recoveryMessage = document.getElementById('recoveryMessage');
+        const pageSubtitle = document.getElementById('pageSubtitle');
+
+        let recoveryStep = 1; // 1: username, 2: security question, 3: new password
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const input = document.getElementById('password');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        document.getElementById('toggleNewPassword').addEventListener('click', function() {
+            const input = document.getElementById('newPassword');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Show/hide forms
+        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            recoveryForm.classList.remove('hidden');
+            pageSubtitle.textContent = 'Password Recovery';
+            recoveryStep = 1;
+            recoveryForm.reset();
+            document.getElementById('securityQuestionGroup').style.display = 'none';
+            document.getElementById('newPasswordGroup').classList.add('hidden');
+            document.getElementById('confirmPasswordGroup').classList.add('hidden');
+        });
+
+        document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            recoveryForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            pageSubtitle.textContent = 'Admin Panel Login';
+            loginForm.reset();
+        });
+
+        // Handle login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Check if account is locked
+            const lockStatus = attemptTracker.isLocked(username);
+            if (lockStatus && lockStatus.locked) {
+                showMessage(loginMessage, `Account locked. Try again in ${lockStatus.minutesLeft} minute(s).`, 'error');
+                return;
+            }
+            
+            // Disable button during login
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            
+            // Simulate network delay
+            setTimeout(() => {
+                const user = userManager.validateCredentials(username, password);
+                
+                if (user) {
+                    // Successful login
+                    attemptTracker.recordAttempt(username, true);
+                    sessionStorage.setItem('adminAuthenticated', 'true');
+                    sessionStorage.setItem('adminUsername', user.username);
+                    sessionStorage.setItem('adminRole', user.role);
+                    sessionStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    window.location.href = 'admin.html';
+                } else {
+                    // Failed login
+                    attemptTracker.recordAttempt(username, false);
+                    const remaining = attemptTracker.getRemainingAttempts(username);
+                    
+                    let message = '❌ Invalid username or password.';
+                    if (remaining > 0 && remaining <= 3) {
+                        message += ` ${remaining} attempt(s) remaining.`;
+                    }
+                    
+                    showMessage(loginMessage, message, 'error');
+                    
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
+                    document.getElementById('password').value = '';
+                }
+            }, 800);
+        });
+
+        // Handle password recovery
+        recoveryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const recoveryBtn = document.getElementById('recoveryBtn');
+            
+            if (recoveryStep === 1) {
+                // Step 1: Verify username and show security question
+                const username = document.getElementById('recoveryUsername').value.trim();
+                const user = userManager.findUser(username);
+                
+                if (!user) {
+                    showMessage(recoveryMessage, '❌ Username not found.', 'error');
+                    return;
+                }
+                
+                document.getElementById('securityQuestionLabel').textContent = user.securityQuestion;
+                document.getElementById('securityQuestionGroup').style.display = 'block';
+                document.getElementById('recoveryUsername').readOnly = true;
+                recoveryStep = 2;
+                recoveryBtn.textContent = 'Verify Answer';
+                showMessage(recoveryMessage, 'Please answer your security question.', 'warning');
+                
+            } else if (recoveryStep === 2) {
+                // Step 2: Verify security answer
+                const username = document.getElementById('recoveryUsername').value.trim();
+                const answer = document.getElementById('securityAnswer').value;
+                
+                if (userManager.validateSecurityAnswer(username, answer)) {
+                    document.getElementById('newPasswordGroup').classList.remove('hidden');
+                    document.getElementById('confirmPasswordGroup').classList.remove('hidden');
+                    document.getElementById('securityAnswer').readOnly = true;
+                    recoveryStep = 3;
+                    recoveryBtn.textContent = 'Reset Password';
+                    showMessage(recoveryMessage, '✅ Correct! Enter your new password.', 'success');
+                } else {
+                    showMessage(recoveryMessage, '❌ Incorrect answer. Please try again.', 'error');
+                    document.getElementById('securityAnswer').value = '';
+                }
+                
+            } else if (recoveryStep === 3) {
+                // Step 3: Reset password
+                const username = document.getElementById('recoveryUsername').value.trim();
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (newPassword.length < 8) {
+                    showMessage(recoveryMessage, '❌ Password must be at least 8 characters.', 'error');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showMessage(recoveryMessage, '❌ Passwords do not match.', 'error');
+                    return;
+                }
+                
+                if (userManager.resetPassword(username, newPassword)) {
+                    showMessage(recoveryMessage, '✅ Password reset successful! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        document.getElementById('backToLoginLink').click();
+                    }, 2000);
+                } else {
+                    showMessage(recoveryMessage, '❌ Failed to reset password.', 'error');
+                }
+            }
+        });
+
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type} show`;
+            setTimeout(() => {
+                element.classList.remove('show');
+            }, 5000);
+        }
+
+        // Check if already logged in
+        if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+            window.location.href = 'admin.html';
+        }
+    </script>
+</body>
+</html>

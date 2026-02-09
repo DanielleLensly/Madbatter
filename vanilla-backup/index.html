@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mad Batter</title>
+    <meta name="description" content="The Mad Batter - Handcrafted breads, pastries, and custom cakes made with love and expertise. Contact us for your special occasions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo">The Mad Batter</a>
+                <div class="nav-links" id="navLinks">
+                    <a href="#home" class="nav-link">Home</a>
+                    <a href="#services" class="nav-link">Services</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Artisan Baking<br>Made with Love</h1>
+            <p class="hero-subtitle">Handcrafted breads, pastries, and custom cakes for every occasion</p>
+            <a href="#contact" class="btn btn-primary">Get in Touch</a>
+        </div>
+        <div class="scroll-indicator">
+            <span></span>
+        </div>
+    </section>
+
+    <!-- Current Specials Section -->
+    <section class="specials" id="specials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Special Offers</h2>
+                <p class="section-subtitle">Discover our limited time deals!</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="specials-tabs">
+                <button class="specials-tab active" data-tab="current">Current Specials</button>
+                <button class="specials-tab" data-tab="upcoming">Upcoming Specials</button>
+                <button class="specials-tab" data-tab="past">Past Specials</button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="specials-tab-content active" id="currentSpecials">
+                <div id="currentSpecialsGrid" class="specials-grid"></div>
+            </div>
+            
+            <div class="specials-tab-content" id="upcomingSpecials">
+                <div id="upcomingSpecialsGrid" class="specials-grid"></div>
+            </div>
+            
+            <div class="specials-tab-content" id="pastSpecials">
+                <div id="pastSpecialsGrid" class="specials-grid"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Services Offered</h2>
+                <p class="section-subtitle">From everyday treats to special occasion masterpieces</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card" data-category="cakes" onclick="openCategoryModal('cakes')">
+                    <div class="service-icon">🎂</div>
+                    <h3 class="service-title">Custom Cakes</h3>
+                    <p class="service-description">Exquisite custom cakes for every celebration. From elegant wedding cakes to whimsical birthday creations, each masterpiece is uniquely designed.</p>
+                </div>
+                
+                <div class="service-card" data-category="cupcakes" onclick="openCategoryModal('cupcakes')">
+                    <div class="service-icon">🧁</div>
+                    <h3 class="service-title">Gourmet Cupcakes</h3>
+                    <p class="service-description">Delightful cupcakes in a variety of flavors, beautifully decorated and perfect for any occasion or sweet indulgence.</p>
+                </div>
+                
+                <div class="service-card" data-category="cakesicles" onclick="openCategoryModal('cakesicles')">
+                    <div class="service-icon">🍰</div>
+                    <h3 class="service-title">Cakesicles</h3>
+                    <p class="service-description">Trendy cake pops on a stick, dipped in premium chocolate and decorated with artistic flair. Perfect for parties and gifts.</p>
+                </div>
+                
+                <div class="service-card" data-category="treatboxes" onclick="openCategoryModal('treatboxes')">
+                    <div class="service-icon">🎁</div>
+                    <h3 class="service-title">Treat Boxes</h3>
+                    <p class="service-description">Curated assortments of our finest baked goods, beautifully packaged for gifts, corporate events, and celebrations.</p>
+                </div>
+                
+                <div class="service-card" data-category="cookies" onclick="openCategoryModal('cookies')">
+                    <div class="service-icon">🍪</div>
+                    <h3 class="service-title">Handcrafted Cookies</h3>
+                    <p class="service-description">Classic and creative cookies baked to perfection. From chocolate chip to decorated sugar cookies, made with love.</p>
+                </div>
+                
+                <div class="service-card" data-category="desserts" onclick="openCategoryModal('desserts')">
+                    <div class="service-icon">🍮</div>
+                    <h3 class="service-title">Decadent Desserts</h3>
+                    <p class="service-description">Indulgent desserts and sweet treats that delight the senses. Perfect for special occasions or everyday indulgence.</p>
+                </div>
+                
+                <div class="service-card" data-category="biscotti" onclick="openCategoryModal('biscotti')">
+                    <div class="service-icon">☕</div>
+                    <h3 class="service-title">Artisan Biscotti</h3>
+                    <p class="service-description">Traditional Italian twice-baked biscotti, crisp and flavorful. Perfect for dunking in your favorite coffee or tea.</p>
+                </div>
+                
+                <div class="service-card" data-category="meals" onclick="openCategoryModal('meals')">
+                    <div class="service-icon">🍽️</div>
+                    <h3 class="service-title">Homestyle Meals</h3>
+                    <p class="service-description">Delicious homemade meals prepared with care. From comfort food to gourmet dishes, bringing warmth to your table.</p>
+                </div>
+                
+                <div class="service-card" data-category="bento" onclick="openCategoryModal('bento')">
+                    <div class="service-icon">🍱</div>
+                    <h3 class="service-title">Bento Cakes</h3>
+                    <p class="service-description">Adorable mini cakes perfect for one or two. Beautifully decorated and ideal for intimate celebrations or personal treats.</p>
+                </div>
+                
+                <div class="service-card" data-category="smash" onclick="openCategoryModal('smash')">
+                    <div class="service-icon">🎉</div>
+                    <h3 class="service-title">Smash Cakes</h3>
+                    <p class="service-description">Fun and photogenic cakes designed for baby's first birthday smash sessions. Safe, delicious, and picture-perfect.</p>
+                </div>
+                
+                <div class="service-card" data-category="occasions" onclick="openCategoryModal('occasions')">
+                    <div class="service-icon">🎊</div>
+                    <h3 class="service-title">Special Occasions</h3>
+                    <p class="service-description">Themed creations for weddings, anniversaries, graduations, and milestone celebrations. Making your moments memorable.</p>
+                </div>
+                
+                <div class="service-card" data-category="treats" onclick="openCategoryModal('treats')">
+                    <div class="service-icon">🍬</div>
+                    <h3 class="service-title">Sweet Treats</h3>
+                    <p class="service-description">An assortment of delightful confections and sweet surprises. Perfect for gifting or satisfying your sweet tooth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <h2 class="section-title">Get in Touch</h2>
+                    <p class="contact-description">Have a question or ready to order? I'd love to hear from you!</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">📞</div>
+                            <div>
+                                <h4>Phone</h4>
+                                <a href="tel:+27843002719">+27 84 300 2719</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">✉️</div>
+                            <div>
+                                <h4>Email</h4>
+                                <a href="mailto:anchen101@gmail.com">anchen101@gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" placeholder="0812345678">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                    <div class="form-status" id="formStatus"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Modal -->
+    <div class="category-modal" id="categoryModal">
+        <div class="category-modal-overlay" onclick="closeCategoryModal()"></div>
+        <div class="category-modal-content">
+            <button class="category-modal-close" onclick="closeCategoryModal()">✕</button>
+            
+            <div class="category-modal-header">
+                <div class="category-modal-icon" id="modalIcon">🎂</div>
+                <h2 class="category-modal-title" id="modalTitle">Custom Cakes</h2>
+                <p class="category-modal-description" id="modalDescription">
+                    Stunning custom cakes for weddings, birthdays, and celebrations.
+                </p>
+            </div>
+
+            <div class="category-modal-body">
+                <h3 class="category-modal-section-title">Our Gallery</h3>
+                <div class="category-modal-gallery" id="modalGallery">
+                    <div class="category-modal-empty">
+                        <span class="empty-icon">🎨</span>
+                        <p>No images available yet for this category</p>
+                        <small>Check back soon for beautiful creations!</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-modal-footer">
+                <a href="#contact" class="btn btn-primary" onclick="closeCategoryModal()">
+                    <span class="btn-icon">✉️</span>
+                    Order Now
+                </a>
+                <button class="btn btn-secondary" onclick="closeCategoryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox -->
+    <div class="image-lightbox" id="imageLightbox" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+        <button class="lightbox-prev" id="lightboxPrev" onclick="event.stopPropagation(); prevImage()">‹</button>
+        <button class="lightbox-next" id="lightboxNext" onclick="event.stopPropagation(); nextImage()">›</button>
+        <img src="" alt="" id="lightboxImage" onclick="event.stopPropagation()">
+        <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+    </div>
+
+    <!-- Thank You Modal -->
+    <div class="thank-you-modal" id="thankYouModal">
+        <div class="thank-you-content">
+            <div class="thank-you-icon">✓</div>
+            <h2 class="thank-you-title">Thank You!</h2>
+            <p class="thank-you-message">Your message has been sent successfully. I'll get back to you as soon as possible!</p>
+            <div class="thank-you-redirect">
+                <p>Redirecting to homepage in <span id="countdown">10</span> seconds...</p>
+                <div class="countdown-bar">
+                    <div class="countdown-progress" id="countdownProgress"></div>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="closeThankYou">Return to Homepage Now</button>
+        </div>
+    </div>
+
+    <!-- Booking Request Modal -->
+    <div class="booking-modal" id="bookingModal">
+        <div class="booking-modal-overlay" onclick="closeBookingModal()"></div>
+        <div class="booking-modal-content">
+            <button class="booking-modal-close" onclick="closeBookingModal()">✕</button>
+            
+            <div class="booking-modal-header">
+                <div class="booking-modal-icon">📅</div>
+                <h2 class="booking-modal-title">Book Your Order</h2>
+                <p class="booking-modal-description">
+                    Fill out the form below and we'll get back to you as soon as possible to confirm your booking!
+                </p>
+            </div>
+
+            <form class="booking-form" id="bookingForm">
+                <div class="form-group">
+                    <label for="bookingName">Name *</label>
+                    <input type="text" id="bookingName" name="name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookingPhone">Phone *</label>
+                        <input type="tel" id="bookingPhone" name="phone" placeholder="0812345678" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingEmail">Email</label>
+                        <input type="email" id="bookingEmail" name="email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookingDate">Booking Date *</label>
+                    <input type="date" id="bookingDate" name="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookingDescription">What would you like to order? *</label>
+                    <textarea id="bookingDescription" name="description" rows="5" required placeholder="Please describe what you'd like to order, including any special requirements, flavors, colors, or design preferences..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">📨</span>
+                    Submit Booking Request
+                </button>
+                <div class="form-status" id="bookingFormStatus"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating Booking Button -->
+    <button class="floating-booking-btn" id="floatingBookingBtn">
+        <span class="floating-btn-icon">📅</span>
+        <span class="floating-btn-text">Book Now</span>
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 The Mad Batter. All rights reserved.</p>
+                <p>Crafted with ❤️ and flour</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

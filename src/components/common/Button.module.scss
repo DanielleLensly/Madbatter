@@ -1,0 +1,91 @@
+@import '../../styles/variables';
+
+.button {
+  padding: $spacing-xs $spacing-sm;
+  border: none;
+  border-radius: $radius-md;
+  font-family: $font-body;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition-base;
+  @include flex-center;
+  gap: $spacing-xs;
+  
+  @include tablet {
+    padding: $spacing-sm $spacing-md;
+    font-size: 1rem;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primary {
+  background: linear-gradient(135deg, $color-primary, $color-accent);
+  color: $color-white;
+  box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba($color-primary, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.secondary {
+  background: $color-secondary;
+  color: $color-dark;
+
+  &:hover:not(:disabled) {
+    background: darken($color-secondary, 5%);
+  }
+}
+
+.outline {
+  background: transparent;
+  border: 2px solid $color-primary;
+  color: $color-primary;
+
+  &:hover:not(:disabled) {
+    background: $color-primary;
+    color: $color-white;
+  }
+}
+
+.danger {
+  background: $color-danger;
+  color: $color-white;
+
+  &:hover:not(:disabled) {
+    background: darken($color-danger, 10%);
+  }
+}
+
+.small {
+  padding: $spacing-xs $spacing-sm;
+  font-size: 0.75rem;
+  
+  @include tablet {
+    font-size: 0.875rem;
+  }
+}
+
+.large {
+  padding: $spacing-sm $spacing-md;
+  font-size: 1rem;
+  
+  @include tablet {
+    padding: $spacing-md $spacing-lg;
+    font-size: 1.125rem;
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}

@@ -1,0 +1,76 @@
+@import './styles/variables';
+
+// ==================== Reset & Base Styles ====================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-body;
+  color: $color-dark;
+  line-height: 1.6;
+  background: $color-white;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: $transition-base;
+}
+
+button {
+  font-family: $font-body;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// ==================== Utility Classes ====================
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+}
+
+// ==================== CSS Variables (for runtime access) ====================
+:root {
+  --color-primary: #{$color-primary};
+  --color-primary-dark: #{$color-primary-dark};
+  --color-primary-light: #{$color-primary-light};
+  --color-secondary: #{$color-secondary};
+  --color-accent: #{$color-accent};
+  --color-dark: #{$color-dark};
+  --color-gray-dark: #{$color-gray-dark};
+  --color-gray: #{$color-gray};
+  --color-gray-light: #{$color-gray-light};
+  --color-light: #{$color-light};
+  --color-white: #{$color-white};
+  --color-success: #{$color-success};
+  --color-danger: #{$color-danger};
+  
+  --font-heading: #{$font-heading};
+  --font-body: #{$font-body};
+  
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+  
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  --radius-xl: #{$radius-xl};
+  
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  
+  --transition-base: #{$transition-base};
+}

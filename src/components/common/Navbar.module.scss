@@ -1,0 +1,167 @@
+@import '../../styles/variables';
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.98);
+  }
+}
+
+.navContent {
+  @include flex-between;
+  padding: 1.25rem 0;
+}
+
+.logo {
+  font-family: $font-heading;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $color-primary;
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  transition: $transition-base;
+
+  @include tablet {
+    font-size: 1.75rem;
+  }
+
+  &:hover {
+    color: $color-primary-dark;
+  }
+}
+
+// Mobile-first: Default mobile menu
+.navLinks {
+  position: fixed;
+  top: 70px;
+  right: -100%;
+  width: min(280px, 80vw);
+  max-width: 280px;
+  background: $color-white;
+  flex-direction: column;
+  padding: $spacing-md;
+  box-shadow: $shadow-lg;
+  transition: right $transition-base;
+  border-radius: $radius-md 0 0 $radius-md;
+  z-index: 999;
+  height: auto;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  display: flex;
+
+  &.active {
+    right: 0;
+  }
+
+  // Tablet and up: horizontal menu
+  @include tablet {
+    position: static;
+    flex-direction: row;
+    width: auto;
+    max-width: none;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+    max-height: none;
+    overflow-y: visible;
+    gap: $spacing-md;
+  }
+}
+
+.navLink {
+  font-weight: 500;
+  color: $color-dark;
+  position: relative;
+  padding: $spacing-sm 0;
+  cursor: pointer;
+  transition: $transition-base;
+  border-bottom: 1px solid $color-gray-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.active {
+    font-weight: 600;
+    color: $color-primary;
+    background: $color-light;
+    padding-left: $spacing-sm;
+    border-radius: $radius-sm;
+  }
+
+  &:hover {
+    color: $color-primary;
+  }
+
+  // Tablet and up: underline effect
+  @include tablet {
+    padding: 0.5rem 0;
+    border-bottom: none;
+    background: transparent !important;
+    padding-left: 0 !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: $color-primary;
+      transition: $transition-base;
+    }
+
+    &:hover::after,
+    &.active::after {
+      width: 100%;
+    }
+  }
+}
+
+// Mobile menu button (hidden on tablet+)
+.mobileMenuBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+
+  @include tablet {
+    display: none;
+  }
+
+  span {
+    width: 25px;
+    height: 3px;
+    background: $color-dark;
+    border-radius: 2px;
+    transition: $transition-base;
+  }
+
+  &.active {
+    span:nth-child(1) {
+      transform: rotate(45deg) translateY(8px);
+    }
+
+    span:nth-child(2) {
+      opacity: 0;
+    }
+
+    span:nth-child(3) {
+      transform: rotate(-45deg) translateY(-8px);
+    }
+  }
+}

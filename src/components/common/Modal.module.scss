@@ -1,0 +1,99 @@
+@import '../../styles/variables';
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  @include flex-center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+  padding: $spacing-md;
+}
+
+.modalContent {
+  background: $color-white;
+  border-radius: $radius-md;
+  width: 100%;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-lg;
+  animation: slideUp 0.3s ease;
+  position: relative;
+  
+  @include tablet {
+    border-radius: $radius-lg;
+  }
+}
+
+.modalHeader {
+  @include flex-between;
+  padding: $spacing-sm;
+  border-bottom: 1px solid $color-gray-light;
+  
+  @include tablet {
+    padding: $spacing-md;
+  }
+
+  h2 {
+    font-family: $font-heading;
+    color: $color-primary;
+    margin: 0;
+    font-size: 1.125rem;
+    
+    @include tablet {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: $color-gray;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  transition: $transition-base;
+  
+  @include tablet {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+  }
+
+  &:hover {
+    color: $color-dark;
+  }
+}
+
+.modalBody {
+  padding: $spacing-sm;
+  
+  @include tablet {
+    padding: $spacing-md;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

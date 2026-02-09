@@ -1,0 +1,193 @@
+@import '../styles/variables';
+
+.loginPage {
+  min-height: 100vh;
+  @include flex-center;
+  background: linear-gradient(135deg, $color-light 0%, $color-white 100%);
+  padding: $spacing-md;
+  
+  @include tablet {
+    padding: $spacing-lg;
+  }
+}
+
+.loginContainer {
+  width: 100%;
+  max-width: 450px;
+}
+
+.loginCard {
+  background: $color-white;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-lg;
+  
+  @include tablet {
+    padding: $spacing-xl;
+  }
+}
+
+.title {
+  font-family: $font-heading;
+  font-size: 2rem;
+  color: $color-primary;
+  text-align: center;
+  margin-bottom: $spacing-xs;
+  
+  @include tablet {
+    font-size: 2.5rem;
+  }
+}
+
+.subtitle {
+  font-family: $font-heading;
+  font-size: 1.25rem;
+  color: $color-gray-dark;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+  font-weight: 400;
+  
+  @include tablet {
+    font-size: 1.5rem;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-weight: 600;
+    color: $color-dark;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+
+  input {
+    padding: $spacing-sm;
+    border: 2px solid $color-gray-light;
+    border-radius: $radius-md;
+    font-family: $font-body;
+    font-size: 0.875rem;
+    transition: $transition-base;
+    
+    @include tablet {
+      padding: $spacing-md;
+      font-size: 1rem;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+    }
+  }
+}
+
+.error {
+  background: lighten($color-danger, 35%);
+  color: $color-danger;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 1px solid $color-danger;
+  
+  @include tablet {
+    padding: $spacing-md;
+    font-size: 1rem;
+  }
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: $color-primary;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: $spacing-xs;
+  transition: $transition-base;
+  
+  @include tablet {
+    font-size: 1rem;
+  }
+
+  &:hover {
+    color: $color-primary-dark;
+    text-decoration: underline;
+  }
+}
+
+.instruction {
+  color: $color-gray-dark;
+  text-align: center;
+  margin: 0;
+  font-size: 0.875rem;
+  
+  @include tablet {
+    font-size: 1rem;
+  }
+}
+
+.securityQuestion {
+  background: $color-light;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  
+  @include tablet {
+    padding: $spacing-md;
+  }
+
+  strong {
+    color: $color-dark;
+    display: block;
+    margin-bottom: $spacing-xs;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+
+  p {
+    color: $color-gray-dark;
+    margin: 0;
+    font-size: 0.875rem;
+    
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+}
+
+.defaultCreds {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $color-gray-light;
+  text-align: center;
+
+  small {
+    color: $color-gray;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    
+    @include tablet {
+      font-size: 0.875rem;
+    }
+
+    strong {
+      color: $color-gray-dark;
+    }
+  }
+}

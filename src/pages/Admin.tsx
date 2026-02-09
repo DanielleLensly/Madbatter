@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
+import ImageUpload from '../components/common/ImageUpload';
 import { useModal } from '../hooks/useModal';
 import { Special, GalleryImage, User } from '../types';
 import { STORAGE_KEYS, CATEGORIES } from '../utils/constants';
@@ -22,9 +23,11 @@ const Admin: React.FC = () => {
 
   // Modals
   const addSpecialModal = useModal();
-  const cancelSpecialModal = useModal();
+  const editSpecialModal = useModal();
   const uploadImageModal = useModal();
+  const editImageModal = useModal();
   const addUserModal = useModal();
+  const editUserModal = useModal();
 
   // Forms
   const [specialForm, setSpecialForm] = useState({
@@ -50,24 +53,24 @@ const Admin: React.FC = () => {
     securityAnswer: ''
   });
 
-  const [selectedSpecialId, setSelectedSpecialId] = useState('');
+  // Edit state
+  const [editingSpecial, setEditingSpecial] = useState<Special | null>(null);
+  const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Handle logout
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/madbatter-login');
   };
 
-  // Handle special form
-  const handleSpecialImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSpecialForm({ ...specialForm, image: file });
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
-      reader.readAsDataURL(file);
-    }
+  // ==================== SPECIALS ====================
+  const handleSpecialImageSelect = (file: File) => {
+    setSpecialForm({ ...specialForm, image: file });
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   const handleAddSpecial = (e: React.FormEvent) => {
@@ -91,35 +94,79 @@ const Admin: React.FC = () => {
       };
 
       setSpecials([newSpecial, ...specials]);
-      setSpecialForm({ title: '', description: '', startDate: '', endDate: '', image: null });
-      setImagePreview(null);
+      resetSpecialForm();
       addSpecialModal.close();
       alert('Special added successfully!');
     };
     reader.readAsDataURL(specialForm.image);
   };
 
-  const handleCancelSpecial = () => {
-    if (!selectedSpecialId) return;
+  const openEditSpecial = (special: Special) => {
+    setEditingSpecial(special);
+    setSpecialForm({
+      title: special.title,
+      description: special.description || '',
+      startDate: special.startDate,
+      endDate: special.endDate,
+      image: null
+    });
+    setImagePreview(special.imageUrl);
+    editSpecialModal.open();
+  };
 
-    const confirmed = window.confirm('Are you sure you want to cancel this special?');
-    if (confirmed) {
-      setSpecials(specials.filter(s => s.id !== selectedSpecialId));
-      setSelectedSpecialId('');
-      cancelSpecialModal.close();
-      alert('Special cancelled successfully!');
+  const handleEditSpecial = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSpecial) return;
+
+    const processUpdate = (imageUrl: string) => {
+      const updatedSpecials = specials.map(s =>
+        s.id === editingSpecial.id
+          ? {
+            ...s,
+            title: specialForm.title,
+            description: specialForm.description,
+            startDate: specialForm.startDate,
+            endDate: specialForm.endDate,
+            imageUrl: imageUrl,
+            fileName: specialForm.image?.name || s.fileName
+          }
+          : s
+      );
+      setSpecials(updatedSpecials);
+      resetSpecialForm();
+      editSpecialModal.close();
+      alert('Special updated successfully!');
+    };
+
+    if (specialForm.image) {
+      const reader = new FileReader();
+      reader.onloadend = () => processUpdate(reader.result as string);
+      reader.readAsDataURL(specialForm.image);
+    } else {
+      processUpdate(editingSpecial.imageUrl);
     }
   };
 
-  // Handle gallery upload
-  const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageForm({ ...imageForm, image: file });
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
-      reader.readAsDataURL(file);
+  const handleDeleteSpecial = (id: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this special?');
+    if (confirmed) {
+      setSpecials(specials.filter(s => s.id !== id));
+      alert('Special deleted successfully!');
     }
+  };
+
+  const resetSpecialForm = () => {
+    setSpecialForm({ title: '', description: '', startDate: '', endDate: '', image: null });
+    setImagePreview(null);
+    setEditingSpecial(null);
+  };
+
+  // ==================== GALLERY ====================
+  const handleGalleryImageSelect = (file: File) => {
+    setImageForm({ ...imageForm, image: file });
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   const handleUploadImage = (e: React.FormEvent) => {
@@ -142,12 +189,55 @@ const Admin: React.FC = () => {
       };
 
       setGalleryImages([newImage, ...galleryImages]);
-      setImageForm({ category: 'cakes', title: '', description: '', image: null });
-      setImagePreview(null);
+      resetImageForm();
       uploadImageModal.close();
       alert('Image uploaded successfully!');
     };
     reader.readAsDataURL(imageForm.image);
+  };
+
+  const openEditImage = (img: GalleryImage) => {
+    setEditingImage(img);
+    setImageForm({
+      category: img.category,
+      title: img.title,
+      description: img.description || '',
+      image: null
+    });
+    setImagePreview(img.imageUrl);
+    editImageModal.open();
+  };
+
+  const handleEditImage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingImage) return;
+
+    const processUpdate = (imageUrl: string) => {
+      const updatedImages = galleryImages.map(img =>
+        img.id === editingImage.id
+          ? {
+            ...img,
+            category: imageForm.category,
+            title: imageForm.title,
+            description: imageForm.description,
+            imageUrl: imageUrl,
+            fileName: imageForm.image?.name || img.fileName
+          }
+          : img
+      );
+      setGalleryImages(updatedImages);
+      resetImageForm();
+      editImageModal.close();
+      alert('Image updated successfully!');
+    };
+
+    if (imageForm.image) {
+      const reader = new FileReader();
+      reader.onloadend = () => processUpdate(reader.result as string);
+      reader.readAsDataURL(imageForm.image);
+    } else {
+      processUpdate(editingImage.imageUrl);
+    }
   };
 
   const handleDeleteImage = (id: string) => {
@@ -158,11 +248,16 @@ const Admin: React.FC = () => {
     }
   };
 
-  // Handle user management
+  const resetImageForm = () => {
+    setImageForm({ category: 'cakes', title: '', description: '', image: null });
+    setImagePreview(null);
+    setEditingImage(null);
+  };
+
+  // ==================== USERS ====================
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check if username already exists
     if (users.some(u => u.username === userForm.username)) {
       alert('Username already exists!');
       return;
@@ -179,9 +274,42 @@ const Admin: React.FC = () => {
     };
 
     setUsers([...users, newUser]);
-    setUserForm({ username: '', email: '', password: '', securityQuestion: '', securityAnswer: '' });
+    resetUserForm();
     addUserModal.close();
     alert('User created successfully!');
+  };
+
+  const openEditUser = (user: User) => {
+    setEditingUser(user);
+    setUserForm({
+      username: user.username,
+      email: user.email || '',
+      password: '',
+      securityQuestion: user.securityQuestion,
+      securityAnswer: ''
+    });
+    editUserModal.open();
+  };
+
+  const handleEditUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    const updatedUsers = users.map(u =>
+      u.username === editingUser.username
+        ? {
+          ...u,
+          email: userForm.email,
+          password: userForm.password || u.password,
+          securityQuestion: userForm.securityQuestion,
+          securityAnswer: userForm.securityAnswer ? userForm.securityAnswer.toLowerCase().trim() : u.securityAnswer
+        }
+        : u
+    );
+    setUsers(updatedUsers);
+    resetUserForm();
+    editUserModal.close();
+    alert('User updated successfully!');
   };
 
   const handleDeleteUser = (username: string) => {
@@ -195,6 +323,11 @@ const Admin: React.FC = () => {
       setUsers(users.filter(u => u.username !== username));
       alert('User deleted successfully!');
     }
+  };
+
+  const resetUserForm = () => {
+    setUserForm({ username: '', email: '', password: '', securityQuestion: '', securityAnswer: '' });
+    setEditingUser(null);
   };
 
   return (
@@ -251,12 +384,7 @@ const Admin: React.FC = () => {
             <div className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2>Manage Specials</h2>
-                <div className={styles.actions}>
-                  <Button onClick={addSpecialModal.open}>+ Add Special</Button>
-                  <Button variant="danger" onClick={cancelSpecialModal.open}>
-                    Cancel Special
-                  </Button>
-                </div>
+                <Button onClick={addSpecialModal.open}>+ Add Special</Button>
               </div>
 
               <div className={styles.grid}>
@@ -269,6 +397,14 @@ const Admin: React.FC = () => {
                         <p>{special.description}</p>
                         <div className={styles.cardMeta}>
                           📅 {formatDate(special.startDate)} - {formatDate(special.endDate)}
+                        </div>
+                        <div className={styles.cardActions}>
+                          <Button size="small" onClick={() => openEditSpecial(special)}>
+                            Edit
+                          </Button>
+                          <Button size="small" variant="danger" onClick={() => handleDeleteSpecial(special.id)}>
+                            Delete
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -301,14 +437,14 @@ const Admin: React.FC = () => {
                         <p className={styles.category}>
                           {CATEGORIES.find(c => c.id === img.category)?.name}
                         </p>
-                        <Button
-                          variant="danger"
-                          size="small"
-                          fullWidth
-                          onClick={() => handleDeleteImage(img.id)}
-                        >
-                          Delete
-                        </Button>
+                        <div className={styles.cardActions}>
+                          <Button size="small" onClick={() => openEditImage(img)}>
+                            Edit
+                          </Button>
+                          <Button size="small" variant="danger" onClick={() => handleDeleteImage(img.id)}>
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -340,14 +476,19 @@ const Admin: React.FC = () => {
                         Created: {formatDate(user.createdDate)}
                       </p>
                     </div>
-                    <Button
-                      variant="danger"
-                      size="small"
-                      onClick={() => handleDeleteUser(user.username)}
-                      disabled={users.length === 1}
-                    >
-                      Delete
-                    </Button>
+                    <div className={styles.cardActions}>
+                      <Button size="small" onClick={() => openEditUser(user)}>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="small"
+                        onClick={() => handleDeleteUser(user.username)}
+                        disabled={users.length === 1}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -359,7 +500,7 @@ const Admin: React.FC = () => {
       {/* Add Special Modal */}
       <Modal
         isOpen={addSpecialModal.isOpen}
-        onClose={addSpecialModal.close}
+        onClose={() => { addSpecialModal.close(); resetSpecialForm(); }}
         title="Add New Special"
         maxWidth="700px"
       >
@@ -406,60 +547,81 @@ const Admin: React.FC = () => {
             </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <label>Image *</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleSpecialImageChange}
-              required
-            />
-            {imagePreview && (
-              <img src={imagePreview} alt="Preview" className={styles.preview} />
-            )}
-          </div>
+          <ImageUpload
+            label="Image"
+            required={true}
+            preview={imagePreview}
+            onImageSelect={handleSpecialImageSelect}
+          />
 
           <Button type="submit" fullWidth>Add Special</Button>
         </form>
       </Modal>
 
-      {/* Cancel Special Modal */}
+      {/* Edit Special Modal */}
       <Modal
-        isOpen={cancelSpecialModal.isOpen}
-        onClose={cancelSpecialModal.close}
-        title="Cancel Special"
+        isOpen={editSpecialModal.isOpen}
+        onClose={() => { editSpecialModal.close(); resetSpecialForm(); }}
+        title="Edit Special"
+        maxWidth="700px"
       >
-        <div className={styles.form}>
+        <form onSubmit={handleEditSpecial} className={styles.form}>
           <div className={styles.formGroup}>
-            <label>Select Special to Cancel</label>
-            <select
-              value={selectedSpecialId}
-              onChange={e => setSelectedSpecialId(e.target.value)}
-            >
-              <option value="">-- Select a special --</option>
-              {specials.map(special => (
-                <option key={special.id} value={special.id}>
-                  {special.title} ({formatDate(special.startDate)} - {formatDate(special.endDate)})
-                </option>
-              ))}
-            </select>
+            <label>Title *</label>
+            <input
+              type="text"
+              value={specialForm.title}
+              onChange={e => setSpecialForm({ ...specialForm, title: e.target.value })}
+              required
+            />
           </div>
 
-          <Button
-            variant="danger"
-            fullWidth
-            onClick={handleCancelSpecial}
-            disabled={!selectedSpecialId}
-          >
-            Cancel Selected Special
-          </Button>
-        </div>
+          <div className={styles.formGroup}>
+            <label>Description</label>
+            <textarea
+              value={specialForm.description}
+              onChange={e => setSpecialForm({ ...specialForm, description: e.target.value })}
+              rows={3}
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Start Date *</label>
+              <input
+                type="date"
+                value={specialForm.startDate}
+                onChange={e => setSpecialForm({ ...specialForm, startDate: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>End Date *</label>
+              <input
+                type="date"
+                value={specialForm.endDate}
+                onChange={e => setSpecialForm({ ...specialForm, endDate: e.target.value })}
+                min={specialForm.startDate}
+                required
+              />
+            </div>
+          </div>
+
+          <ImageUpload
+            label="Image (leave empty to keep current)"
+            preview={imagePreview}
+            onImageSelect={handleSpecialImageSelect}
+          />
+
+          <Button type="submit" fullWidth>Save Changes</Button>
+        </form>
       </Modal>
 
       {/* Upload Image Modal */}
       <Modal
         isOpen={uploadImageModal.isOpen}
-        onClose={uploadImageModal.close}
+        onClose={() => { uploadImageModal.close(); resetImageForm(); }}
         title="Upload Image"
         maxWidth="700px"
       >
@@ -498,27 +660,73 @@ const Admin: React.FC = () => {
             />
           </div>
 
-          <div className={styles.formGroup}>
-            <label>Image *</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleGalleryImageChange}
-              required
-            />
-            {imagePreview && (
-              <img src={imagePreview} alt="Preview" className={styles.preview} />
-            )}
-          </div>
+          <ImageUpload
+            label="Image"
+            required={true}
+            preview={imagePreview}
+            onImageSelect={handleGalleryImageSelect}
+          />
 
           <Button type="submit" fullWidth>Upload Image</Button>
+        </form>
+      </Modal>
+
+      {/* Edit Image Modal */}
+      <Modal
+        isOpen={editImageModal.isOpen}
+        onClose={() => { editImageModal.close(); resetImageForm(); }}
+        title="Edit Image"
+        maxWidth="700px"
+      >
+        <form onSubmit={handleEditImage} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Category *</label>
+            <select
+              value={imageForm.category}
+              onChange={e => setImageForm({ ...imageForm, category: e.target.value })}
+              required
+            >
+              {CATEGORIES.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.icon} {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Title *</label>
+            <input
+              type="text"
+              value={imageForm.title}
+              onChange={e => setImageForm({ ...imageForm, title: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Description</label>
+            <textarea
+              value={imageForm.description}
+              onChange={e => setImageForm({ ...imageForm, description: e.target.value })}
+              rows={2}
+            />
+          </div>
+
+          <ImageUpload
+            label="Image (leave empty to keep current)"
+            preview={imagePreview}
+            onImageSelect={handleGalleryImageSelect}
+          />
+
+          <Button type="submit" fullWidth>Save Changes</Button>
         </form>
       </Modal>
 
       {/* Add User Modal */}
       <Modal
         isOpen={addUserModal.isOpen}
-        onClose={addUserModal.close}
+        onClose={() => { addUserModal.close(); resetUserForm(); }}
         title="Add New User"
         maxWidth="700px"
       >
@@ -575,6 +783,67 @@ const Admin: React.FC = () => {
           </div>
 
           <Button type="submit" fullWidth>Create User</Button>
+        </form>
+      </Modal>
+
+      {/* Edit User Modal */}
+      <Modal
+        isOpen={editUserModal.isOpen}
+        onClose={() => { editUserModal.close(); resetUserForm(); }}
+        title={`Edit User: ${editingUser?.username}`}
+        maxWidth="700px"
+      >
+        <form onSubmit={handleEditUser} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Username</label>
+            <input
+              type="text"
+              value={userForm.username}
+              disabled
+              className={styles.disabled}
+            />
+            <small>Username cannot be changed</small>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Email</label>
+            <input
+              type="email"
+              value={userForm.email}
+              onChange={e => setUserForm({ ...userForm, email: e.target.value })}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>New Password (leave empty to keep current)</label>
+            <input
+              type="password"
+              value={userForm.password}
+              onChange={e => setUserForm({ ...userForm, password: e.target.value })}
+              placeholder="Enter new password"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Security Question</label>
+            <input
+              type="text"
+              value={userForm.securityQuestion}
+              onChange={e => setUserForm({ ...userForm, securityQuestion: e.target.value })}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>New Security Answer (leave empty to keep current)</label>
+            <input
+              type="text"
+              value={userForm.securityAnswer}
+              onChange={e => setUserForm({ ...userForm, securityAnswer: e.target.value })}
+              placeholder="Enter new security answer"
+            />
+          </div>
+
+          <Button type="submit" fullWidth>Save Changes</Button>
         </form>
       </Modal>
     </div>

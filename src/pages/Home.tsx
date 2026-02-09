@@ -6,6 +6,7 @@ import Button from '../components/common/Button';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useModal } from '../hooks/useModal';
 import { useImageLoader } from '../hooks/useImageLoader';
+import { sendBookingEmail, sendContactEmail } from '../utils/emailService';
 import { Special, GalleryImage, CategoryType } from '../types';
 import { formatDate, isDateInRange, isDateBefore, isDateAfter } from '../utils/dateUtils';
 import { formatPhoneNumber, unformatPhoneNumber } from '../utils/phoneUtils';
@@ -42,6 +43,9 @@ const Home: React.FC = () => {
     message: ''
   });
 
+  const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
+  const [isContactSubmitting, setIsContactSubmitting] = useState(false);
+
   // Filter specials by date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -55,30 +59,55 @@ const Home: React.FC = () => {
     ? galleryImages.filter(img => img.category === selectedCategory)
     : [];
 
-  const handleBookingSubmit = (e: React.FormEvent) => {
+  const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save booking request
-    const bookingRequests = JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKING_REQUESTS) || '[]');
-    bookingRequests.push({
-      ...bookingForm,
-      phone: unformatPhoneNumber(bookingForm.phone),
-      submittedAt: new Date().toISOString()
-    });
-    localStorage.setItem(STORAGE_KEYS.BOOKING_REQUESTS, JSON.stringify(bookingRequests));
+    setIsBookingSubmitting(true);
 
-    bookingModal.close();
-    thankYouModal.open();
-    setBookingForm({ name: '', phone: '', email: '', date: '', description: '' });
+    try {
+      // 1. Send Email
+      await sendBookingEmail({
+        ...bookingForm,
+        phone: unformatPhoneNumber(bookingForm.phone)
+      });
+
+      // 2. Save local backup (optional, keeping existing logic)
+      const bookingRequests = JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKING_REQUESTS) || '[]');
+      bookingRequests.push({
+        ...bookingForm,
+        phone: unformatPhoneNumber(bookingForm.phone),
+        submittedAt: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_KEYS.BOOKING_REQUESTS, JSON.stringify(bookingRequests));
+
+      // 3. UI Updates
+      bookingModal.close();
+      thankYouModal.open();
+      setBookingForm({ name: '', phone: '', email: '', date: '', description: '' });
+    } catch (error) {
+      alert('Failed to send booking request. Please try again or contact us directly.');
+      console.error(error);
+    } finally {
+      setIsBookingSubmitting(false);
+    }
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const submissionData = {
-      ...contactForm,
-      phone: unformatPhoneNumber(contactForm.phone)
-    };
-    alert(`Contact form submitted! Phone: ${submissionData.phone} (In production, this would send an email)`);
-    setContactForm({ name: '', email: '', phone: '', message: '' });
+    setIsContactSubmitting(true);
+
+    try {
+      await sendContactEmail({
+        ...contactForm,
+        phone: unformatPhoneNumber(contactForm.phone)
+      });
+      alert('Message sent successfully!');
+      setContactForm({ name: '', email: '', phone: '', message: '' });
+    } catch (error) {
+      alert('Failed to send message. Please try again later.');
+      console.error(error);
+    } finally {
+      setIsContactSubmitting(false);
+    }
   };
 
   const openServiceModal = (category: CategoryType) => {
@@ -265,7 +294,9 @@ const Home: React.FC = () => {
                 onChange={e => setContactForm({ ...contactForm, message: e.target.value })}
                 required
               />
-              <Button type="submit" fullWidth>Send Message</Button>
+              <Button type="submit" fullWidth disabled={isContactSubmitting}>
+                {isContactSubmitting ? 'Sending...' : 'Send Message'}
+              </Button>
             </form>
           </div>
         </div>
@@ -308,7 +339,9 @@ const Home: React.FC = () => {
             onChange={e => setBookingForm({ ...bookingForm, description: e.target.value })}
             required
           />
-          <Button type="submit" fullWidth>Submit Request</Button>
+          <Button type="submit" fullWidth disabled={isBookingSubmitting}>
+            {isBookingSubmitting ? 'Sending...' : 'Submit Request'}
+          </Button>
         </form>
       </Modal>
 

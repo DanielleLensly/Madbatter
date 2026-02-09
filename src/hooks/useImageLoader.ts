@@ -36,7 +36,7 @@ export const useImageLoader = () => {
             category,
             title,
             description: `Beautiful ${title.toLowerCase()}`,
-            imageUrl: `/images/${category}/${fileName}`,
+            imageUrl: `${import.meta.env.BASE_URL}images/${category}/${fileName}`,
             fileName,
             uploadDate: new Date().toISOString(),
           });

@@ -1,5 +1,5 @@
 export const STORAGE_KEYS = {
-  GALLERY_IMAGES: 'bakeryGallery',
+  GALLERY_IMAGES: 'bakeryGallery_v2',
   SPECIALS: 'bakerySpecials',
   USERS: 'bakeryUsers',
   BOOKING_REQUESTS: 'bakeryBookingRequests',

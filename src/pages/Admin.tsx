@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -10,19 +10,96 @@ import { Special, GalleryImage, User } from '../types';
 import { STORAGE_KEYS, CATEGORIES } from '../utils/constants';
 import { formatDate } from '../utils/dateUtils';
 import { defaultGalleryImages } from '../data/defaultGalleryData';
+import {
+  getSpecials,
+  addSpecialToDb,
+  updateSpecialInDb,
+  deleteSpecialFromDb
+} from '../services/specialsService';
+import {
+  getUsers,
+  addUserToDb,
+  updateUserInDb,
+  deleteUserFromDb
+} from '../services/usersService';
+import {
+  Booking,
+  getBookings,
+  updateBookingStatus,
+  deleteBookingFromDb
+} from '../services/bookingsService';
 import styles from './Admin.module.scss';
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
-  const { logout, username } = useAuth();
-  const [activeTab, setActiveTab] = useState<'specials' | 'gallery' | 'users'>('specials');
+  const { signOut, user } = useAuth();
+  const [activeTab, setActiveTab] = useState<'specials' | 'gallery' | 'users' | 'bookings'>('specials');
 
-  // Storage
-  const [specials, setSpecials] = useLocalStorage<Special[]>(STORAGE_KEYS.SPECIALS, []);
+  // ==================== STATE ====================
+  // Specials (Supabase)
+  const [specials, setSpecials] = useState<Special[]>([]);
+  const [specialsLoading, setSpecialsLoading] = useState(true);
+
+  // Users (Supabase)
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+
+  // Bookings (Supabase)
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+
+  // Gallery (LocalStorage - unchanged for now)
   const [galleryImages, setGalleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, defaultGalleryImages);
-  const [users, setUsers] = useLocalStorage<User[]>(STORAGE_KEYS.USERS, []);
 
-  // Modals
+  // ==================== INITIAL DATA FETCH ====================
+  useEffect(() => {
+    fetchSpecials();
+  }, []);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    if (activeTab === 'users') fetchUsers();
+    if (activeTab === 'bookings') fetchBookings();
+  }, [activeTab]);
+
+  const fetchSpecials = async () => {
+    try {
+      setSpecialsLoading(true);
+      const data = await getSpecials();
+      setSpecials(data);
+    } catch (error) {
+      console.error('Error fetching specials:', error);
+      alert('Failed to load specials.');
+    } finally {
+      setSpecialsLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      setUsersLoading(true);
+      const data = await getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const fetchBookings = async () => {
+    try {
+      setBookingsLoading(true);
+      const data = await getBookings();
+      setBookings(data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
+  // ==================== MODALS ====================
   const addSpecialModal = useModal();
   const editSpecialModal = useModal();
   const uploadImageModal = useModal();
@@ -30,7 +107,7 @@ const Admin: React.FC = () => {
   const addUserModal = useModal();
   const editUserModal = useModal();
 
-  // Forms
+  // ==================== FORMS ====================
   const [specialForm, setSpecialForm] = useState({
     title: '',
     description: '',
@@ -61,12 +138,12 @@ const Admin: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Handle logout
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/madbatter-login');
   };
 
-  // ==================== SPECIALS ====================
+  // ==================== SPECIALS HANDLERS ====================
   const handleSpecialImageSelect = (file: File) => {
     setSpecialForm({ ...specialForm, image: file });
     const reader = new FileReader();
@@ -74,32 +151,35 @@ const Admin: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleAddSpecial = (e: React.FormEvent) => {
+  const handleAddSpecial = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!specialForm.image) {
       alert('Please select an image');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const newSpecial: Special = {
-        id: Date.now().toString(),
-        title: specialForm.title,
-        description: specialForm.description,
-        startDate: specialForm.startDate,
-        endDate: specialForm.endDate,
-        imageUrl: reader.result as string,
-        fileName: specialForm.image!.name,
-        createdDate: new Date().toISOString()
-      };
+    try {
+      setSpecialsLoading(true);
+      await addSpecialToDb(
+        {
+          title: specialForm.title,
+          description: specialForm.description,
+          startDate: specialForm.startDate,
+          endDate: specialForm.endDate
+        },
+        specialForm.image
+      );
 
-      setSpecials([newSpecial, ...specials]);
+      await fetchSpecials(); // Refresh list
       resetSpecialForm();
       addSpecialModal.close();
       alert('Special added successfully!');
-    };
-    reader.readAsDataURL(specialForm.image);
+    } catch (error) {
+      console.error('Error adding special:', error);
+      alert('Failed to add special.');
+    } finally {
+      setSpecialsLoading(false);
+    }
   };
 
   const openEditSpecial = (special: Special) => {
@@ -115,44 +195,48 @@ const Admin: React.FC = () => {
     editSpecialModal.open();
   };
 
-  const handleEditSpecial = (e: React.FormEvent) => {
+  const handleEditSpecial = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingSpecial) return;
 
-    const processUpdate = (imageUrl: string) => {
-      const updatedSpecials = specials.map(s =>
-        s.id === editingSpecial.id
-          ? {
-            ...s,
-            title: specialForm.title,
-            description: specialForm.description,
-            startDate: specialForm.startDate,
-            endDate: specialForm.endDate,
-            imageUrl: imageUrl,
-            fileName: specialForm.image?.name || s.fileName
-          }
-          : s
+    try {
+      setSpecialsLoading(true);
+      await updateSpecialInDb(
+        editingSpecial.id,
+        {
+          title: specialForm.title,
+          description: specialForm.description,
+          startDate: specialForm.startDate,
+          endDate: specialForm.endDate
+        },
+        specialForm.image || undefined
       );
-      setSpecials(updatedSpecials);
+
+      await fetchSpecials(); // Refresh list
       resetSpecialForm();
       editSpecialModal.close();
       alert('Special updated successfully!');
-    };
-
-    if (specialForm.image) {
-      const reader = new FileReader();
-      reader.onloadend = () => processUpdate(reader.result as string);
-      reader.readAsDataURL(specialForm.image);
-    } else {
-      processUpdate(editingSpecial.imageUrl);
+    } catch (error) {
+      console.error('Error updating special:', error);
+      alert('Failed to update special.');
+    } finally {
+      setSpecialsLoading(false);
     }
   };
 
-  const handleDeleteSpecial = (id: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this special?');
-    if (confirmed) {
-      setSpecials(specials.filter(s => s.id !== id));
+  const handleDeleteSpecial = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this special?')) return;
+
+    try {
+      setSpecialsLoading(true);
+      await deleteSpecialFromDb(id);
+      await fetchSpecials(); // Refresh list
       alert('Special deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting special:', error);
+      alert('Failed to delete special.');
+    } finally {
+      setSpecialsLoading(false);
     }
   };
 
@@ -162,7 +246,7 @@ const Admin: React.FC = () => {
     setEditingSpecial(null);
   };
 
-  // ==================== GALLERY ====================
+  // ==================== GALLERY HANDLERS (LocalStorage) ====================
   const handleGalleryImageSelect = (file: File) => {
     setImageForm({ ...imageForm, image: file });
     const reader = new FileReader();
@@ -255,29 +339,31 @@ const Admin: React.FC = () => {
     setEditingImage(null);
   };
 
-  // ==================== USERS ====================
-  const handleAddUser = (e: React.FormEvent) => {
+  // ==================== USER HANDLERS ====================
+  const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (users.some(u => u.username === userForm.username)) {
-      alert('Username already exists!');
-      return;
+    try {
+      await addUserToDb({
+        username: userForm.username,
+        email: userForm.email,
+        password: userForm.password,
+        securityQuestion: userForm.securityQuestion,
+        securityAnswer: userForm.securityAnswer
+      });
+
+      await fetchUsers();
+      resetUserForm();
+      addUserModal.close();
+      alert('User created successfully!');
+    } catch (error: any) {
+      console.error('Error adding user:', error);
+      if (error.code === '23505') { // Postgres unique violation code
+        alert('Username already exists!');
+      } else {
+        alert('Failed to create user.');
+      }
     }
-
-    const newUser: User = {
-      username: userForm.username,
-      email: userForm.email,
-      password: userForm.password,
-      role: 'admin',
-      securityQuestion: userForm.securityQuestion,
-      securityAnswer: userForm.securityAnswer.toLowerCase().trim(),
-      createdDate: new Date().toISOString()
-    };
-
-    setUsers([...users, newUser]);
-    resetUserForm();
-    addUserModal.close();
-    alert('User created successfully!');
   };
 
   const openEditUser = (user: User) => {
@@ -292,43 +378,72 @@ const Admin: React.FC = () => {
     editUserModal.open();
   };
 
-  const handleEditUser = (e: React.FormEvent) => {
+  const handleEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
 
-    const updatedUsers = users.map(u =>
-      u.username === editingUser.username
-        ? {
-          ...u,
-          email: userForm.email,
-          password: userForm.password || u.password,
-          securityQuestion: userForm.securityQuestion,
-          securityAnswer: userForm.securityAnswer ? userForm.securityAnswer.toLowerCase().trim() : u.securityAnswer
-        }
-        : u
-    );
-    setUsers(updatedUsers);
-    resetUserForm();
-    editUserModal.close();
-    alert('User updated successfully!');
+    try {
+      await updateUserInDb(editingUser.username, {
+        email: userForm.email,
+        password: userForm.password || undefined,
+        securityQuestion: userForm.securityQuestion || undefined,
+        securityAnswer: userForm.securityAnswer || undefined
+      });
+
+      await fetchUsers();
+      resetUserForm();
+      editUserModal.close();
+      alert('User updated successfully!');
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Failed to update user.');
+    }
   };
 
-  const handleDeleteUser = (username: string) => {
-    if (users.length === 1) {
+  const handleDeleteUser = async (username: string) => {
+    if (users.length === 1 && users[0].username === username) {
       alert('Cannot delete the last user!');
       return;
     }
 
-    const confirmed = window.confirm(`Are you sure you want to delete user "${username}"?`);
-    if (confirmed) {
-      setUsers(users.filter(u => u.username !== username));
+    if (!window.confirm(`Are you sure you want to delete user "${username}"?`)) return;
+
+    try {
+      await deleteUserFromDb(username);
+      await fetchUsers();
       alert('User deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user.');
     }
   };
 
   const resetUserForm = () => {
     setUserForm({ username: '', email: '', password: '', securityQuestion: '', securityAnswer: '' });
     setEditingUser(null);
+  };
+
+  // ==================== BOOKING HANDLERS ====================
+  const handleUpdateBookingStatus = async (id: string, status: string) => {
+    try {
+      await updateBookingStatus(id, status);
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      alert('Failed to update booking status.');
+    }
+  };
+
+  const handleDeleteBooking = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this booking?')) return;
+
+    try {
+      await deleteBookingFromDb(id);
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      alert('Failed to delete booking.');
+    }
   };
 
   return (
@@ -339,7 +454,7 @@ const Admin: React.FC = () => {
           <div className={styles.headerContent}>
             <h1>Admin Dashboard</h1>
             <div className={styles.headerActions}>
-              <span className={styles.username}>👤 {username}</span>
+              <span className={styles.username}>👤 {user?.email}</span>
               <a href="https://daniellelensly.github.io/Madbatter/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                 <Button variant="outline">
                   View Site
@@ -374,6 +489,12 @@ const Admin: React.FC = () => {
           >
             👥 Users
           </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'bookings' ? styles.active : ''}`}
+            onClick={() => setActiveTab('bookings')}
+          >
+            📅 Bookings
+          </button>
         </div>
       </div>
 
@@ -388,35 +509,39 @@ const Admin: React.FC = () => {
                 <Button onClick={addSpecialModal.open}>+ Add Special</Button>
               </div>
 
-              <div className={styles.grid}>
-                {specials.length > 0 ? (
-                  specials.map(special => (
-                    <div key={special.id} className={styles.card}>
-                      <img src={special.imageUrl} alt={special.title} className={styles.cardImage} />
-                      <div className={styles.cardContent}>
-                        <h3>{special.title}</h3>
-                        <p>{special.description}</p>
-                        <div className={styles.cardMeta}>
-                          📅 {formatDate(special.startDate)} - {formatDate(special.endDate)}
-                        </div>
-                        <div className={styles.cardActions}>
-                          <Button size="small" onClick={() => openEditSpecial(special)}>
-                            Edit
-                          </Button>
-                          <Button size="small" variant="danger" onClick={() => handleDeleteSpecial(special.id)}>
-                            Delete
-                          </Button>
+              {specialsLoading ? (
+                <div className={styles.loading}>Loading specials...</div>
+              ) : (
+                <div className={styles.grid}>
+                  {specials.length > 0 ? (
+                    specials.map(special => (
+                      <div key={special.id} className={styles.card}>
+                        <img src={special.imageUrl} alt={special.title} className={styles.cardImage} />
+                        <div className={styles.cardContent}>
+                          <h3>{special.title}</h3>
+                          <p>{special.description}</p>
+                          <div className={styles.cardMeta}>
+                            📅 {formatDate(special.startDate)} - {formatDate(special.endDate)}
+                          </div>
+                          <div className={styles.cardActions}>
+                            <Button size="small" onClick={() => openEditSpecial(special)}>
+                              Edit
+                            </Button>
+                            <Button size="small" variant="danger" onClick={() => handleDeleteSpecial(special.id)}>
+                              Delete
+                            </Button>
+                          </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className={styles.empty}>
+                      <span className={styles.emptyIcon}>📢</span>
+                      <p>No specials yet. Click "Add Special" to create one!</p>
                     </div>
-                  ))
-                ) : (
-                  <div className={styles.empty}>
-                    <span className={styles.emptyIcon}>📢</span>
-                    <p>No specials yet. Click "Add Special" to create one!</p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -467,32 +592,101 @@ const Admin: React.FC = () => {
                 <Button onClick={addUserModal.open}>+ Add User</Button>
               </div>
 
-              <div className={styles.usersList}>
-                {users.map(user => (
-                  <div key={user.username} className={styles.userCard}>
-                    <div className={styles.userInfo}>
-                      <h3>👤 {user.username}</h3>
-                      {user.email && <p>📧 {user.email}</p>}
-                      <p className={styles.userMeta}>
-                        Created: {formatDate(user.createdDate)}
-                      </p>
+              {usersLoading ? (
+                <div className={styles.loading}>Loading users...</div>
+              ) : (
+                <div className={styles.usersList}>
+                  {users.map(user => (
+                    <div key={user.username} className={styles.userCard}>
+                      <div className={styles.userInfo}>
+                        <h3>👤 {user.username}</h3>
+                        {user.email && <p>📧 {user.email}</p>}
+                        <p className={styles.userMeta}>
+                          Created: {formatDate(user.createdDate)}
+                        </p>
+                      </div>
+                      <div className={styles.cardActions}>
+                        <Button size="small" onClick={() => openEditUser(user)}>
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="small"
+                          onClick={() => handleDeleteUser(user.username)}
+                          disabled={users.length === 1}
+                        >
+                          Delete
+                        </Button>
+                      </div>
                     </div>
-                    <div className={styles.cardActions}>
-                      <Button size="small" onClick={() => openEditUser(user)}>
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="small"
-                        onClick={() => handleDeleteUser(user.username)}
-                        disabled={users.length === 1}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Bookings Tab */}
+          {activeTab === 'bookings' && (
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2>Manage Bookings</h2>
+                <div className={styles.refreshBtn}>
+                  <Button size="small" variant="outline" onClick={fetchBookings}>🔄 Refresh</Button>
+                </div>
               </div>
+
+              {bookingsLoading ? (
+                <div className={styles.loading}>Loading bookings...</div>
+              ) : (
+                <div className={styles.bookingsList}>
+                  {bookings.length > 0 ? (
+                    bookings.map(booking => (
+                      <div key={booking.id} className={`${styles.bookingCard} ${styles[booking.status]}`}>
+                        <div className={styles.bookingHeader}>
+                          <h3>{booking.name}</h3>
+                          <span className={`${styles.statusBadge} ${styles[booking.status]}`}>
+                            {booking.status.toUpperCase()}
+                          </span>
+                        </div>
+
+                        <div className={styles.bookingDetails}>
+                          <p><strong>Date:</strong> {formatDate(booking.eventDate)}</p>
+                          <p><strong>Phone:</strong> {booking.phone}</p>
+                          {booking.email && <p><strong>Email:</strong> {booking.email}</p>}
+                          <p className={styles.bookingDesc}>{booking.description}</p>
+                          <p className={styles.submittedAt}>Submitted: {new Date(booking.submittedAt).toLocaleString()}</p>
+                        </div>
+
+                        <div className={styles.bookingActions}>
+                          <select
+                            value={booking.status}
+                            onChange={(e) => handleUpdateBookingStatus(booking.id, e.target.value)}
+                            className={styles.statusSelect}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+
+                          <Button
+                            size="small"
+                            variant="danger"
+                            onClick={() => handleDeleteBooking(booking.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={styles.empty}>
+                      <span className={styles.emptyIcon}>📅</span>
+                      <p>No bookings yet.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -555,7 +749,9 @@ const Admin: React.FC = () => {
             onImageSelect={handleSpecialImageSelect}
           />
 
-          <Button type="submit" fullWidth>Add Special</Button>
+          <Button type="submit" fullWidth disabled={specialsLoading}>
+            {specialsLoading ? 'Adding...' : 'Add Special'}
+          </Button>
         </form>
       </Modal>
 
@@ -615,7 +811,9 @@ const Admin: React.FC = () => {
             onImageSelect={handleSpecialImageSelect}
           />
 
-          <Button type="submit" fullWidth>Save Changes</Button>
+          <Button type="submit" fullWidth disabled={specialsLoading}>
+            {specialsLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
         </form>
       </Modal>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import Hero from '../components/home/Hero';
@@ -13,13 +13,17 @@ import { formatDate, isDateInRange, isDateBefore, isDateAfter } from '../utils/d
 import { formatPhoneNumber, unformatPhoneNumber, isValidPhoneNumber } from '../utils/phoneUtils';
 import { STORAGE_KEYS, CATEGORIES } from '../utils/constants';
 import { defaultGalleryImages } from '../data/defaultGalleryData';
+import { getSpecials } from '../services/specialsService';
+import { submitBooking } from '../services/bookingsService';
 import styles from './Home.module.scss';
 
 const Home: React.FC = () => {
   // Auto-load images from manifest on first app load
   useImageLoader();
 
-  const [specials] = useLocalStorage<Special[]>(STORAGE_KEYS.SPECIALS, []);
+  const [specials, setSpecials] = useState<Special[]>([]);
+  const [specialsLoading, setSpecialsLoading] = useState(true);
+
   const [galleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, defaultGalleryImages);
 
   const [activeSpecialsTab, setActiveSpecialsTab] = useState<'current' | 'upcoming' | 'past'>('current');
@@ -49,6 +53,22 @@ const Home: React.FC = () => {
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Fetch specials from Supabase
+  useEffect(() => {
+    const fetchSpecials = async () => {
+      try {
+        setSpecialsLoading(true);
+        const data = await getSpecials();
+        setSpecials(data);
+      } catch (error) {
+        console.error('Error fetching specials:', error);
+      } finally {
+        setSpecialsLoading(false);
+      }
+    };
+    fetchSpecials();
+  }, []);
 
   // Filter specials by date
   const today = new Date();
@@ -106,14 +126,14 @@ const Home: React.FC = () => {
         phone: unformatPhoneNumber(bookingForm.phone)
       });
 
-      // 2. Save local backup (optional, keeping existing logic)
-      const bookingRequests = JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKING_REQUESTS) || '[]');
-      bookingRequests.push({
-        ...bookingForm,
+      // 2. Save to Supabase (Success even if email fails, but we try email first above)
+      await submitBooking({
+        name: bookingForm.name,
         phone: unformatPhoneNumber(bookingForm.phone),
-        submittedAt: new Date().toISOString()
+        email: bookingForm.email,
+        date: bookingForm.date,
+        description: bookingForm.description
       });
-      localStorage.setItem(STORAGE_KEYS.BOOKING_REQUESTS, JSON.stringify(bookingRequests));
 
       // 3. UI Updates
       bookingModal.close();
@@ -214,78 +234,84 @@ const Home: React.FC = () => {
           </div>
 
           <div className={styles.specialsGrid}>
-            {activeSpecialsTab === 'current' && (
-              currentSpecials.length > 0 ? (
-                currentSpecials.map(special => (
-                  <div key={special.id} className={styles.specialCard}>
-                    <span className={styles.specialBadge}>Special Offer</span>
-                    <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
-                    <div className={styles.specialContent}>
-                      <h3>{special.title}</h3>
-                      {special.description && <p>{special.description}</p>}
-                      <div className={styles.specialDates}>
-                        📅 {formatDate(special.startDate)} - {formatDate(special.endDate)}
+            {specialsLoading ? (
+              <div className={styles.loading}>Loading specials...</div>
+            ) : (
+              <>
+                {activeSpecialsTab === 'current' && (
+                  currentSpecials.length > 0 ? (
+                    currentSpecials.map(special => (
+                      <div key={special.id} className={styles.specialCard}>
+                        <span className={styles.specialBadge}>Special Offer</span>
+                        <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
+                        <div className={styles.specialContent}>
+                          <h3>{special.title}</h3>
+                          {special.description && <p>{special.description}</p>}
+                          <div className={styles.specialDates}>
+                            📅 {formatDate(special.startDate)} - {formatDate(special.endDate)}
+                          </div>
+                          <Button onClick={bookingModal.open}>Order Now →</Button>
+                        </div>
                       </div>
-                      <Button onClick={bookingModal.open}>Order Now →</Button>
+                    ))
+                  ) : (
+                    <div className={styles.emptyState}>
+                      <span className={styles.emptyIcon}>🎉</span>
+                      <h3>No Active Specials</h3>
+                      <p>Check back soon for amazing deals!</p>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className={styles.emptyState}>
-                  <span className={styles.emptyIcon}>🎉</span>
-                  <h3>No Active Specials</h3>
-                  <p>Check back soon for amazing deals!</p>
-                </div>
-              )
-            )}
+                  )
+                )}
 
-            {activeSpecialsTab === 'upcoming' && (
-              upcomingSpecials.length > 0 ? (
-                upcomingSpecials.map(special => (
-                  <div key={special.id} className={styles.specialCard}>
-                    <span className={`${styles.specialBadge} ${styles.upcoming}`}>Coming Soon</span>
-                    <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
-                    <div className={styles.specialContent}>
-                      <h3>{special.title}</h3>
-                      {special.description && <p>{special.description}</p>}
-                      <div className={styles.specialDates}>
-                        ⏰ Starts {formatDate(special.startDate)}
+                {activeSpecialsTab === 'upcoming' && (
+                  upcomingSpecials.length > 0 ? (
+                    upcomingSpecials.map(special => (
+                      <div key={special.id} className={styles.specialCard}>
+                        <span className={`${styles.specialBadge} ${styles.upcoming}`}>Coming Soon</span>
+                        <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
+                        <div className={styles.specialContent}>
+                          <h3>{special.title}</h3>
+                          {special.description && <p>{special.description}</p>}
+                          <div className={styles.specialDates}>
+                            ⏰ Starts {formatDate(special.startDate)}
+                          </div>
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className={styles.emptyState}>
+                      <span className={styles.emptyIcon}>⏰</span>
+                      <h3>No Upcoming Specials</h3>
+                      <p>Stay tuned for exciting new offers!</p>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className={styles.emptyState}>
-                  <span className={styles.emptyIcon}>⏰</span>
-                  <h3>No Upcoming Specials</h3>
-                  <p>Stay tuned for exciting new offers!</p>
-                </div>
-              )
-            )}
+                  )
+                )}
 
-            {activeSpecialsTab === 'past' && (
-              pastSpecials.length > 0 ? (
-                pastSpecials.map(special => (
-                  <div key={special.id} className={`${styles.specialCard} ${styles.past}`}>
-                    <span className={`${styles.specialBadge} ${styles.expired}`}>Expired</span>
-                    <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
-                    <div className={styles.specialContent}>
-                      <h3>{special.title}</h3>
-                      {special.description && <p>{special.description}</p>}
-                      <div className={styles.specialDates}>
-                        📅 Ran from {formatDate(special.startDate)} to {formatDate(special.endDate)}
+                {activeSpecialsTab === 'past' && (
+                  pastSpecials.length > 0 ? (
+                    pastSpecials.map(special => (
+                      <div key={special.id} className={`${styles.specialCard} ${styles.past}`}>
+                        <span className={`${styles.specialBadge} ${styles.expired}`}>Expired</span>
+                        <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
+                        <div className={styles.specialContent}>
+                          <h3>{special.title}</h3>
+                          {special.description && <p>{special.description}</p>}
+                          <div className={styles.specialDates}>
+                            📅 Ran from {formatDate(special.startDate)} to {formatDate(special.endDate)}
+                          </div>
+                          <div className={styles.expiredNotice}>This offer has ended</div>
+                        </div>
                       </div>
-                      <div className={styles.expiredNotice}>This offer has ended</div>
+                    ))
+                  ) : (
+                    <div className={styles.emptyState}>
+                      <span className={styles.emptyIcon}>📜</span>
+                      <h3>No Past Specials</h3>
+                      <p>Previous special offers will appear here.</p>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className={styles.emptyState}>
-                  <span className={styles.emptyIcon}>📜</span>
-                  <h3>No Past Specials</h3>
-                  <p>Previous special offers will appear here.</p>
-                </div>
-              )
+                  )
+                )}
+              </>
             )}
           </div>
         </div>

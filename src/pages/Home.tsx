@@ -32,6 +32,7 @@ const Home: React.FC = () => {
 
   const bookingModal = useModal();
   const serviceModal = useModal();
+  const specialModal = useModal();
   const thankYouModal = useModal();
 
   const [bookingForm, setBookingForm] = useState({
@@ -48,6 +49,8 @@ const Home: React.FC = () => {
     phone: '',
     message: ''
   });
+
+  const [selectedSpecial, setSelectedSpecial] = useState<Special | null>(null);
 
   const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
@@ -201,6 +204,16 @@ const Home: React.FC = () => {
     serviceModal.open();
   };
 
+  const handleSpecialClick = (special: Special) => {
+    setSelectedSpecial(special);
+    specialModal.open();
+  };
+
+  const handleOrderNowFromSpecial = () => {
+    specialModal.close();
+    bookingModal.open();
+  };
+
   return (
     <div className={styles.home}>
       <Navbar />
@@ -243,7 +256,13 @@ const Home: React.FC = () => {
                     currentSpecials.map(special => (
                       <div key={special.id} className={styles.specialCard}>
                         <span className={styles.specialBadge}>Special Offer</span>
-                        <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
+                        <img
+                          src={special.imageUrl}
+                          alt={special.title}
+                          className={styles.specialImage}
+                          onClick={() => handleSpecialClick(special)}
+                          style={{ cursor: 'pointer' }}
+                        />
                         <div className={styles.specialContent}>
                           <h3>{special.title}</h3>
                           {special.description && <p>{special.description}</p>}
@@ -268,7 +287,13 @@ const Home: React.FC = () => {
                     upcomingSpecials.map(special => (
                       <div key={special.id} className={styles.specialCard}>
                         <span className={`${styles.specialBadge} ${styles.upcoming}`}>Coming Soon</span>
-                        <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
+                        <img
+                          src={special.imageUrl}
+                          alt={special.title}
+                          className={styles.specialImage}
+                          onClick={() => handleSpecialClick(special)}
+                          style={{ cursor: 'pointer' }}
+                        />
                         <div className={styles.specialContent}>
                           <h3>{special.title}</h3>
                           {special.description && <p>{special.description}</p>}
@@ -292,7 +317,13 @@ const Home: React.FC = () => {
                     pastSpecials.map(special => (
                       <div key={special.id} className={`${styles.specialCard} ${styles.past}`}>
                         <span className={`${styles.specialBadge} ${styles.expired}`}>Expired</span>
-                        <img src={special.imageUrl} alt={special.title} className={styles.specialImage} />
+                        <img
+                          src={special.imageUrl}
+                          alt={special.title}
+                          className={styles.specialImage}
+                          onClick={() => handleSpecialClick(special)}
+                          style={{ cursor: 'pointer' }}
+                        />
                         <div className={styles.specialContent}>
                           <h3>{special.title}</h3>
                           {special.description && <p>{special.description}</p>}
@@ -486,6 +517,36 @@ const Home: React.FC = () => {
             <p>No images available for this category yet.</p>
           )}
         </div>
+      </Modal>
+
+      {/* Special Detail Modal */}
+      <Modal
+        isOpen={specialModal.isOpen}
+        onClose={specialModal.close}
+        title={selectedSpecial?.title || 'Special Offer'}
+        maxWidth="800px"
+      >
+        {selectedSpecial && (
+          <div className={styles.specialModalContent}>
+            <img src={selectedSpecial.imageUrl} alt={selectedSpecial.title} className={styles.specialModalImage} />
+            <div className={styles.specialModalInfo}>
+              <div>
+                <h3>{selectedSpecial.title}</h3>
+                <p>{selectedSpecial.description}</p>
+                <div className={styles.specialModalDates}>
+                  📅 Valid: {formatDate(selectedSpecial.startDate)} - {formatDate(selectedSpecial.endDate)}
+                </div>
+
+                {isDateAfter(today, selectedSpecial.endDate) && (
+                  <div className={styles.specialModalExpired}>
+                    <p>⚠️ This special offer has expired, but you can still order your own custom treats here!</p>
+                  </div>
+                )}
+              </div>
+              <Button onClick={handleOrderNowFromSpecial} fullWidth>Order Now →</Button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* Lightbox */}

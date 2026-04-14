@@ -7,8 +7,8 @@ import { AuthProvider } from './context/AuthContext';
 import './App.scss';
 
 function App() {
-  // Use /Madbatter/ basename in production (GitHub Pages), root in development
-  const basename = import.meta.env.PROD ? '/Madbatter' : '/';
+  // Use the base path defined in vite.config.ts
+  const basename = import.meta.env.BASE_URL;
 
   return (
     <AuthProvider>

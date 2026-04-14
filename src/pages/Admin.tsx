@@ -476,7 +476,7 @@ const Admin: React.FC = () => {
             <h1>Admin Dashboard</h1>
             <div className={styles.headerActions}>
               <span className={styles.username}>👤 {user?.email}</span>
-              <a href={window.location.origin} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <a href={`${window.location.origin}${import.meta.env.BASE_URL}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                 <Button variant="outline">
                   View Site
                 </Button>

@@ -22,7 +22,7 @@ class UserManager {
                 id: this.generateId(),
                 username: 'anchen',
                 password: this.hashPassword('madbatter2026'),
-                email: 'anchen101@gmail.com',
+                email: 'goldilocsdev@gmail.com',
                 role: 'admin',
                 securityQuestion: 'What is the name of your bakery?',
                 securityAnswer: this.hashPassword('the mad batter'),

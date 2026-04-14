@@ -51,6 +51,10 @@ const Admin: React.FC = () => {
   // Gallery (LocalStorage - unchanged for now)
   const [galleryImages, setGalleryImages] = useLocalStorage<GalleryImage[]>(STORAGE_KEYS.GALLERY_IMAGES, defaultGalleryImages);
 
+  // Logout Countdown
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+
   // ==================== INITIAL DATA FETCH ====================
   useEffect(() => {
     fetchSpecials();
@@ -139,8 +143,23 @@ const Admin: React.FC = () => {
 
   // Handle logout
   const handleLogout = async () => {
-    await signOut();
-    navigate('/madbatter-login');
+    setIsLoggingOut(true);
+    let count = 5;
+    setCountdown(count);
+
+    const interval = setInterval(() => {
+      count -= 1;
+      setCountdown(count);
+      if (count <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    setTimeout(async () => {
+      clearInterval(interval);
+      await signOut();
+      navigate('/');
+    }, 5000);
   };
 
   // ==================== SPECIALS HANDLERS ====================
@@ -1044,6 +1063,20 @@ const Admin: React.FC = () => {
 
           <Button type="submit" fullWidth>Save Changes</Button>
         </form>
+      </Modal>
+      {/* Logout Modal */}
+      <Modal
+        isOpen={isLoggingOut}
+        onClose={() => {}} // Non-closable
+        maxWidth="450px"
+      >
+        <div className={styles.logoutModalContent}>
+          <h2>Logging Out</h2>
+          <p>Successfully logged out!</p>
+          <p>Taking you back to the home page in:</p>
+          <span className={styles.countdown}>{countdown}</span>
+          <span className={styles.logoutIcon} role="img" aria-label="wave">👋</span>
+        </div>
       </Modal>
     </div>
   );

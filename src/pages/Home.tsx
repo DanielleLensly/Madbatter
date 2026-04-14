@@ -373,18 +373,18 @@ const Home: React.FC = () => {
           <h2 className={styles.sectionTitle}>Get in Touch</h2>
           <div className={styles.contactGrid}>
             <div className={styles.contactInfo}>
-              <a href="tel:+27843002719" className={styles.contactItem}>
+              <a href="tel:+27631510081" className={styles.contactItem}>
                 <span className={styles.contactIcon}>📞</span>
                 <div>
                   <h4>Phone</h4>
-                  <p>084 300 2719</p>
+                  <p>063 151 0081</p>
                 </div>
               </a>
-              <a href="mailto:anchen101@gmail.com" className={styles.contactItem}>
+              <a href="mailto:goldilocsdev@gmail.com" className={styles.contactItem}>
                 <span className={styles.contactIcon}>📧</span>
                 <div>
                   <h4>Email</h4>
-                  <p>anchen101@gmail.com</p>
+                  <p>goldilocsdev@gmail.com</p>
                 </div>
               </a>
             </div>

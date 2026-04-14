@@ -430,3 +430,43 @@ small {
   margin-top: $spacing-xs;
 }
 
+// Logout Countdown Styling
+.logoutModalContent {
+  text-align: center;
+  padding: $spacing-xl $spacing-md;
+
+  h2 {
+    color: $color-primary;
+    margin-bottom: $spacing-md;
+    font-family: $font-heading;
+    font-size: 2rem;
+  }
+
+  p {
+    margin-bottom: $spacing-sm;
+    font-size: 1.125rem;
+    color: $color-gray-dark;
+  }
+
+  .countdown {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: $color-secondary;
+    display: block;
+    margin: $spacing-md 0;
+  }
+
+  .logoutIcon {
+    font-size: 4rem;
+    margin-top: $spacing-lg;
+    display: block;
+    animation: bounce 2s infinite;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(-20px);}
+  60% {transform: translateY(-10px);}
+}
+

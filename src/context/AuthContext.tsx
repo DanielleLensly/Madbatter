@@ -77,8 +77,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const signInWithGoogle = async () => {
-    // Construct redirect URL dynamically, including base path (e.g., /Madbatter/)
-    const redirectUrl = `${window.location.origin}${import.meta.env.BASE_URL}madbatter-login`;
+    // Construct redirect URL dynamically
+    // In dev: http://localhost:3000/madbatter-login
+    // In prod: https://daniellelensly.github.io/Madbatter/madbatter-login
+    const origin = window.location.origin;
+    const base = import.meta.env.BASE_URL;
+    const redirectUrl = `${origin}${base}${base.endsWith('/') ? '' : '/'}madbatter-login`.replace(/([^:]\/)\/+/g, "$1");
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

@@ -157,8 +157,8 @@ const Admin: React.FC = () => {
 
     setTimeout(async () => {
       clearInterval(interval);
+      navigate('/', { replace: true });
       await signOut();
-      navigate('/');
     }, 5000);
   };
 

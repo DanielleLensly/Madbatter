@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     try {
       // Check if email exists in users table
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('users')
         .select('id, role')
         .or(`email.eq.${email},username.eq.${email}`) // Check both fields just in case

@@ -143,6 +143,7 @@ const Admin: React.FC = () => {
 
   // Handle logout
   const handleLogout = async () => {
+    console.log('Logout initiated');
     setIsLoggingOut(true);
     let count = 5;
     setCountdown(count);
@@ -156,6 +157,7 @@ const Admin: React.FC = () => {
     }, 1000);
 
     setTimeout(async () => {
+      console.log('Redirecting to home and signing out...');
       clearInterval(interval);
       navigate('/', { replace: true });
       await signOut();
@@ -474,7 +476,7 @@ const Admin: React.FC = () => {
             <h1>Admin Dashboard</h1>
             <div className={styles.headerActions}>
               <span className={styles.username}>👤 {user?.email}</span>
-              <a href="https://daniellelensly.github.io/Madbatter/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <a href={window.location.origin} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                 <Button variant="outline">
                   View Site
                 </Button>
